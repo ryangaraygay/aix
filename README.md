@@ -82,6 +82,47 @@ The init skill will:
 
 ---
 
+## Installation Roadmap
+
+Currently aix requires cloning the framework locally. Future installation methods are planned:
+
+| Phase | Method | Status |
+|-------|--------|--------|
+| **Now** | Clone repo, run `bootstrap.sh` | Current |
+| **Later** | `npm install -g @ryangaraygay/aix` | After validation |
+| **Public** | `curl -fsSL https://aix.dev/install.sh \| sh` | When repo is public |
+
+### Current Method (Clone)
+
+```bash
+# 1. Clone the aix framework
+git clone git@github.com:ryangaraygay/aix.git ~/Gitea/aix
+
+# 2. In your project, run bootstrap
+cd my-project
+~/Gitea/aix/bootstrap.sh
+```
+
+### Future: npm Global (Planned)
+
+```bash
+# Install globally
+npm install -g @ryangaraygay/aix
+
+# Use anywhere
+aix init
+aix upgrade
+```
+
+### Future: Curl Bootstrap (When Public)
+
+```bash
+# One-liner to bootstrap any project
+curl -fsSL https://aix.dev/install.sh | sh
+```
+
+---
+
 ## Input Documents
 
 Every project needs these (templates provided):
@@ -102,7 +143,7 @@ After `/aix-init`, your project will have:
 your-project/
 ├── CLAUDE.md              # → .aix/constitution.md
 ├── .claude/
-│   ├── agents.md          # Generated from roles
+│   ├── agents/            # → .aix/roles/
 │   └── skills/            # → .aix/skills/
 ├── .aix/
 │   ├── constitution.md    # Principles
