@@ -17,11 +17,38 @@ metadata:
 
 Initialize or upgrade the aix framework in your project.
 
+## CRITICAL: Use Scripts, Don't Generate
+
+> **IMPORTANT**: This skill MUST run the actual scripts from the aix framework.
+> Do NOT generate or improvise role/workflow content. The framework files are canonical.
+
+**Framework location**: `~/Gitea/aix` (or `$AIX_FRAMEWORK` if set)
+
 ## Usage
 
 ```
 /aix-init           # Initialize new project
 /aix-init upgrade   # Upgrade existing project to next tier
+```
+
+## For Init (new project)
+
+Run the bootstrap script:
+```bash
+~/Gitea/aix/bootstrap.sh
+```
+
+## For Upgrade (existing project)
+
+Run the upgrade script:
+```bash
+~/Gitea/aix/upgrade.sh [target-tier]
+```
+
+Example:
+```bash
+~/Gitea/aix/upgrade.sh 1   # Upgrade to Tier 1
+~/Gitea/aix/upgrade.sh     # Upgrade to next tier (current + 1)
 ```
 
 ## Init Flow
