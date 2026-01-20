@@ -3,18 +3,6 @@
 > Auto-generated from aix roles. Do not edit directly.
 > Regenerate with: `./aix/adapters/claude-code/generate.sh`
 
-## orchestrator
-
-Main coordinator - routes work, manages state, handles escalations.
-
-**Tools:** Read, Bash, Grep, Glob
-
-**Instructions:** Follow `.aix/roles/orchestrator.md`
-
-**When to use:** At the start of any substantial work session to coordinate the workflow.
-
----
-
 ## triage
 
 Validate issues before planning - confirm reproducibility, check for duplicates/fixes.
