@@ -27,9 +27,13 @@ Additions for established projects with CI/CD needs and team coordination.
 
 ### CI Templates
 
-| Template | Purpose |
-|----------|---------|
-| [ci.yml](ci/ci.yml) | GitHub Actions CI with lint, typecheck, test, build |
+Auto-selected based on `docs/tech-stack.md` Runtime:
+
+| Runtime | Template |
+|---------|----------|
+| Node.js / TypeScript | [ci-node.yml](ci/ci-node.yml) |
+| Python | [ci-python.yml](ci/ci-python.yml) |
+| Go | [ci-go.yml](ci/ci-go.yml) |
 
 ### Skills
 
@@ -54,25 +58,28 @@ feature.md
 security-audit/SKILL.md
 quality-audit/SKILL.md
 
-# CI template (copy manually)
-# From: .aix/ci/ci.yml
-# To:   .github/workflows/ci.yml
+# CI template (auto-selected based on tech-stack.md)
+# .aix/ci/ci.yml  ← Copy to .github/workflows/ci.yml
 ```
 
 ## Setting Up CI
 
-1. Copy the CI template:
+The upgrade script automatically selects a CI template based on your `docs/tech-stack.md` Runtime field.
+
+1. Copy the generated CI template:
    ```bash
    mkdir -p .github/workflows
    cp .aix/ci/ci.yml .github/workflows/ci.yml
    ```
 
 2. Customize for your project:
-   - Adjust Node version if needed
-   - Change `npm` to `pnpm` or `yarn` if applicable
-   - Update script names (`lint`, `typecheck`, `test`, `build`)
+   - Adjust runtime version if needed
+   - Change package manager (`npm`→`pnpm`, `pip`→`poetry`, etc.)
+   - Update script names to match your `package.json` / `Makefile`
 
 3. Commit and push to enable CI
+
+**Manual selection**: If auto-detection fails, all templates are copied to `.aix/ci/`. Choose the right one and rename to `ci.yml`.
 
 ## Using New Roles
 

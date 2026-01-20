@@ -100,12 +100,38 @@ for ((tier = CURRENT_TIER + 1; tier <= TARGET_TIER; tier++)); do
         done
     fi
 
-    # Copy CI templates (to .aix/ci, user copies to .github/workflows)
+    # Select and copy CI template based on tech-stack.md
     if [ -d "$TIER_DIR/ci" ]; then
-        echo "  Adding CI templates..."
+        echo "  Selecting CI template..."
         mkdir -p "$AIX_DIR/ci"
-        cp -r "$TIER_DIR/ci/"* "$AIX_DIR/ci/"
-        echo -e "  ${YELLOW}Note: Copy CI templates from .aix/ci/ to .github/workflows/${NC}"
+
+        # Detect runtime from tech-stack.md
+        TECH_STACK_FILE="$REPO_ROOT/docs/tech-stack.md"
+        CI_TEMPLATE=""
+
+        if [ -f "$TECH_STACK_FILE" ]; then
+            # Parse Runtime row from tech-stack.md
+            RUNTIME=$(grep -i "| Runtime" "$TECH_STACK_FILE" | head -1)
+
+            if echo "$RUNTIME" | grep -qi "node\|javascript\|typescript"; then
+                CI_TEMPLATE="ci-node.yml"
+            elif echo "$RUNTIME" | grep -qi "python"; then
+                CI_TEMPLATE="ci-python.yml"
+            elif echo "$RUNTIME" | grep -qi "go\|golang"; then
+                CI_TEMPLATE="ci-go.yml"
+            fi
+        fi
+
+        if [ -n "$CI_TEMPLATE" ] && [ -f "$TIER_DIR/ci/$CI_TEMPLATE" ]; then
+            cp "$TIER_DIR/ci/$CI_TEMPLATE" "$AIX_DIR/ci/ci.yml"
+            echo -e "  ${GREEN}Selected $CI_TEMPLATE based on tech-stack.md${NC}"
+        else
+            # Fallback: copy all templates, let user choose
+            cp -r "$TIER_DIR/ci/"* "$AIX_DIR/ci/"
+            echo -e "  ${YELLOW}Could not detect runtime. All CI templates copied to .aix/ci/${NC}"
+        fi
+
+        echo -e "  ${YELLOW}Note: Copy .aix/ci/ci.yml to .github/workflows/ci.yml${NC}"
     fi
 
     echo -e "  ${GREEN}Tier $tier complete${NC}"
