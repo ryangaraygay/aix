@@ -100,6 +100,14 @@ for ((tier = CURRENT_TIER + 1; tier <= TARGET_TIER; tier++)); do
         done
     fi
 
+    # Copy CI templates (to .aix/ci, user copies to .github/workflows)
+    if [ -d "$TIER_DIR/ci" ]; then
+        echo "  Adding CI templates..."
+        mkdir -p "$AIX_DIR/ci"
+        cp -r "$TIER_DIR/ci/"* "$AIX_DIR/ci/"
+        echo -e "  ${YELLOW}Note: Copy CI templates from .aix/ci/ to .github/workflows/${NC}"
+    fi
+
     echo -e "  ${GREEN}Tier $tier complete${NC}"
 done
 
