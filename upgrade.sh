@@ -87,15 +87,61 @@ for ((tier = CURRENT_TIER + 1; tier <= TARGET_TIER; tier++)); do
         done
     fi
 
-    # Copy hooks
+    # Copy git hooks (pre-commit, commit-msg, etc.) to .husky
     if [ -d "$TIER_DIR/hooks" ]; then
-        echo "  Adding hooks..."
-        mkdir -p "$REPO_ROOT/.husky"
-        for hook in "$TIER_DIR/hooks/"*; do
-            if [ -f "$hook" ]; then
-                hook_name=$(basename "$hook")
-                cp "$hook" "$REPO_ROOT/.husky/$hook_name"
-                chmod +x "$REPO_ROOT/.husky/$hook_name"
+        # Check if these are git hooks or Claude Code hooks
+        if ls "$TIER_DIR/hooks/"*compact* 1>/dev/null 2>&1; then
+            # Claude Code hooks (compaction) go to .aix/hooks/
+            echo "  Adding Claude Code hooks..."
+            mkdir -p "$AIX_DIR/hooks"
+            for hook in "$TIER_DIR/hooks/"*; do
+                if [ -f "$hook" ]; then
+                    hook_name=$(basename "$hook")
+                    cp "$hook" "$AIX_DIR/hooks/$hook_name"
+                    chmod +x "$AIX_DIR/hooks/$hook_name"
+                fi
+            done
+            echo -e "  ${YELLOW}Note: Configure hooks in .claude/settings.json${NC}"
+        else
+            # Git hooks go to .husky
+            echo "  Adding git hooks..."
+            mkdir -p "$REPO_ROOT/.husky"
+            for hook in "$TIER_DIR/hooks/"*; do
+                if [ -f "$hook" ]; then
+                    hook_name=$(basename "$hook")
+                    cp "$hook" "$REPO_ROOT/.husky/$hook_name"
+                    chmod +x "$REPO_ROOT/.husky/$hook_name"
+                fi
+            done
+        fi
+    fi
+
+    # Copy scripts to .aix/scripts/
+    if [ -d "$TIER_DIR/scripts" ]; then
+        echo "  Adding scripts..."
+        mkdir -p "$AIX_DIR/scripts"
+        for script in "$TIER_DIR/scripts/"*; do
+            if [ -f "$script" ]; then
+                script_name=$(basename "$script")
+                cp "$script" "$AIX_DIR/scripts/$script_name"
+                chmod +x "$AIX_DIR/scripts/$script_name"
+            fi
+        done
+    fi
+
+    # Copy doc templates to docs/
+    if [ -d "$TIER_DIR/docs" ]; then
+        echo "  Adding doc templates..."
+        mkdir -p "$REPO_ROOT/docs"
+        for doc in "$TIER_DIR/docs/"*; do
+            if [ -f "$doc" ]; then
+                doc_name=$(basename "$doc")
+                # Don't overwrite existing docs
+                if [ ! -f "$REPO_ROOT/docs/$doc_name" ]; then
+                    cp "$doc" "$REPO_ROOT/docs/$doc_name"
+                else
+                    echo -e "    ${YELLOW}Skipped $doc_name (already exists)${NC}"
+                fi
             fi
         done
     fi
