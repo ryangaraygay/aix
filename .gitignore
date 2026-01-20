@@ -1,0 +1,23 @@
+# aix state (ephemeral)
+.aix/state/
+.aix-handoff.md
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
+*.env
+
+# Generated (can be regenerated)
+# Keep these tracked for now, but could be gitignored in user projects
+# CLAUDE.md
+# .claude/

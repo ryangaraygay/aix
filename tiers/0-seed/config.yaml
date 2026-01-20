@@ -1,0 +1,54 @@
+# aix Configuration
+# Tier 0 (Seed) - Minimal configuration
+
+# Severity classification for review findings
+severity:
+  critical:
+    description: "Must fix - blocks release"
+    examples:
+      - "Security vulnerability"
+      - "Data loss potential"
+      - "Core functionality broken"
+    action: block_merge
+
+  high:
+    description: "Should fix - significant issue"
+    examples:
+      - "Spec not fully implemented"
+      - "Missing error handling"
+      - "Missing tests for core functionality"
+    action: block_merge
+
+  medium:
+    description: "Consider fixing - quality concern"
+    examples:
+      - "Edge cases not handled"
+      - "Code clarity issues"
+      - "Minor pattern deviations"
+    action: log_and_continue
+
+  low:
+    description: "Nice to have - minor improvement"
+    examples:
+      - "Style inconsistencies"
+      - "Naming improvements"
+      - "Documentation gaps"
+    action: log_only
+
+# Approval gates
+approval_gates:
+  after_analysis: true      # User approves spec before coding
+  before_commit: true       # User approves before committing
+  before_push: true         # User approves before pushing
+
+# Workflow settings
+workflow:
+  default: standard
+  max_review_iterations: 3  # Max times to loop between implement and review
+
+# Paths
+paths:
+  specs: docs/specs
+  state: .aix/state         # gitignored
+  roles: .aix/roles
+  workflows: .aix/workflows
