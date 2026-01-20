@@ -8,8 +8,17 @@ Additions for complex projects with parallel development and long-running AI ses
 - Long AI sessions that hit context limits
 - Need for strategic planning documents
 - Team coordination across workstreams
+- Complex bugs requiring systematic investigation
+- Product ideation before technical implementation
 
 ## What's Added
+
+### Roles
+
+| Role | Purpose |
+|------|---------|
+| [debug](roles/debug.md) | Systematic bug investigation with root cause analysis and TDD-mandatory fixes |
+| [product-designer](roles/product-designer.md) | Pre-implementation ideation, UX strategy, product spec creation |
 
 ### Scripts
 
@@ -147,6 +156,46 @@ Document system state:
 - What's implemented vs. planned
 - Known limitations
 - Deprecations
+
+## Using New Roles
+
+### Debug Role
+
+For complex bugs that need systematic investigation:
+
+```
+"Use the debug role to investigate why the search returns empty results"
+
+Debug agent will:
+1. Gather info (error, stack trace, steps to reproduce)
+2. Form hypotheses ranked by likelihood
+3. Investigate systematically (binary search, logging, isolation)
+4. Write failing test BEFORE fix (TDD mandatory)
+5. Implement fix
+6. Verify test passes
+```
+
+Time limits:
+- Simple bug: 15-20 minutes
+- Medium bug: 30-45 minutes
+- Complex bug: 60 minutes, then escalate
+
+### Product Designer Role
+
+For pre-implementation ideation and UX planning:
+
+```
+"Help me design a feature for usage statistics"
+
+Product designer will:
+1. Explore existing code/docs to ground recommendations
+2. Ask clarifying questions (who, what problem, why now)
+3. Challenge assumptions, surface conflicts
+4. Lock decisions explicitly
+5. Create product/UX spec in docs/specs/
+```
+
+The product designer **does not write code**. Output is a spec file that the analyst picks up later.
 
 ## This is the Final Tier
 
