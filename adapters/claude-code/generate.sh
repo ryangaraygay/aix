@@ -87,51 +87,98 @@ if [ -d "$AIX_DIR/skills" ] || [ -d "$AIX_DIR/$TIER_PATH/skills" ] 2>/dev/null; 
 fi
 
 # Generate settings.json with hooks configuration
-# Format: {"EventName": [{"matcher": "pattern", "hooks": [{"type": "command", "command": "..."}]}]}
-# Matcher is a string (regex pattern), not an object
+# Format matches ebblyn-ecosystem (known working)
 SETTINGS_FILE="$CLAUDE_DIR/settings.json"
 
 if [ -d "$HOOKS_DIR" ] && [ "$(ls -A "$HOOKS_DIR" 2>/dev/null)" ]; then
     echo "Generating .claude/settings.json with hooks..."
 
-    # Start building JSON
-    HOOKS_JSON=""
-
-    # Check for pre-compact hook (runs on both manual and auto compaction)
-    if [ -f "$HOOKS_DIR/pre-compact.sh" ]; then
-        HOOKS_JSON="$HOOKS_JSON\"PreCompact\": [{\"hooks\": [{\"type\": \"command\", \"command\": \"$HOOKS_CMD_PATH/pre-compact.sh\"}]}],"
-    fi
-
-    # Check for post-compact hook (SessionStart with matcher "compact")
-    if [ -f "$HOOKS_DIR/post-compact.sh" ]; then
-        HOOKS_JSON="$HOOKS_JSON\"SessionStart\": [{\"matcher\": \"compact\", \"hooks\": [{\"type\": \"command\", \"command\": \"$HOOKS_CMD_PATH/post-compact.sh\"}]}],"
-    fi
-
-    # Check for validate-bash hook (PreToolUse with matcher "Bash")
-    if [ -f "$HOOKS_DIR/validate-bash.sh" ]; then
-        HOOKS_JSON="$HOOKS_JSON\"PreToolUse\": [{\"matcher\": \"Bash\", \"hooks\": [{\"type\": \"command\", \"command\": \"$HOOKS_CMD_PATH/validate-bash.sh\"}]}],"
-    fi
-
-    # Remove trailing comma and wrap
-    HOOKS_JSON="${HOOKS_JSON%,}"
-
-    if [ -n "$HOOKS_JSON" ]; then
-        cat > "$SETTINGS_FILE" << EOF
+    # Build hooks JSON matching ebblyn format exactly
+    cat > "$SETTINGS_FILE" << EOF
 {
-  "\$schema": "https://json.schemastore.org/claude-code-settings.json",
   "hooks": {
-    $HOOKS_JSON
+EOF
+
+    FIRST_HOOK=true
+
+    # Check for validate-bash hook (PreToolUse)
+    if [ -f "$HOOKS_DIR/validate-bash.sh" ]; then
+        [ "$FIRST_HOOK" = false ] && echo "," >> "$SETTINGS_FILE"
+        FIRST_HOOK=false
+        cat >> "$SETTINGS_FILE" << EOF
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOOKS_CMD_PATH/validate-bash.sh"
+          }
+        ]
+      }
+    ]
+EOF
+    fi
+
+    # Check for pre-compact hook (needs both auto and manual matchers)
+    if [ -f "$HOOKS_DIR/pre-compact.sh" ]; then
+        [ "$FIRST_HOOK" = false ] && echo "," >> "$SETTINGS_FILE"
+        FIRST_HOOK=false
+        cat >> "$SETTINGS_FILE" << EOF
+    "PreCompact": [
+      {
+        "matcher": "auto",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOOKS_CMD_PATH/pre-compact.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "manual",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOOKS_CMD_PATH/pre-compact.sh"
+          }
+        ]
+      }
+    ]
+EOF
+    fi
+
+    # Check for post-compact hook (SessionStart with compact matcher)
+    if [ -f "$HOOKS_DIR/post-compact.sh" ]; then
+        [ "$FIRST_HOOK" = false ] && echo "," >> "$SETTINGS_FILE"
+        FIRST_HOOK=false
+        cat >> "$SETTINGS_FILE" << EOF
+    "SessionStart": [
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOOKS_CMD_PATH/post-compact.sh"
+          }
+        ]
+      }
+    ]
+EOF
+    fi
+
+    # Close the JSON
+    cat >> "$SETTINGS_FILE" << EOF
   }
 }
 EOF
-        echo "✓ Created .claude/settings.json with hooks"
-    fi
+    echo "✓ Created .claude/settings.json with hooks"
 else
     # No hooks, create minimal settings
     if [ ! -f "$SETTINGS_FILE" ]; then
         cat > "$SETTINGS_FILE" << EOF
 {
-  "\$schema": "https://json.schemastore.org/claude-code-settings.json"
+  "hooks": {}
 }
 EOF
         echo "✓ Created .claude/settings.json (no hooks)"
