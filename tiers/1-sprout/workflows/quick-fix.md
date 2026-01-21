@@ -38,15 +38,35 @@ Use the **standard workflow** instead if:
 **Steps**:
 1. Understand the issue
 2. Identify the fix location
-3. Make the change
-4. Write/update tests
-5. Run tests to verify
+3. **Write failing test first** (TDD - see below)
+4. Make the change
+5. Run tests to verify fix works
 
 **Outputs**:
+- Failing test that reproduces the bug
 - Fixed code
 - Passing tests
 
 **Gate**: Tests pass before proceeding to review.
+
+#### TDD Requirement for Bug Fixes
+
+> **Bug fixes require TDD**: Write a failing test FIRST, then fix.
+
+```
+1. Write test that reproduces the bug
+2. Run test → confirm it FAILS (proves bug exists)
+3. Implement fix
+4. Run test → confirm it PASSES
+5. Commit test + fix together
+```
+
+**Why TDD for bugs:**
+- Proves the bug exists before fixing
+- Prevents regression (test catches if bug returns)
+- Reviewer can verify the test actually tests the bug
+
+**Reviewer will reject** bug fixes without a reproducing test.
 
 ---
 

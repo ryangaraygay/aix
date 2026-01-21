@@ -222,6 +222,54 @@ If in doubt: fix it. A fixed issue never needs to be discussed again.
 > **For aix-factor (autonomous)**: Default to "fix now" for < 10 min fixes.
 > Defer > 10 min fixes (no user to ask).
 
+### Verification Strategy
+
+Test run strategy varies by test type:
+
+| Test Type | When to Write | When to Run | Notes |
+|-----------|---------------|-------------|-------|
+| **Unit** | ALWAYS | Local (before PR) | Fast, no deps |
+| **Component** | ALWAYS | Local (before PR) | Mocked, fast |
+| **Integration** | Default: write | CI (PR check) | Real DB, slower |
+| **E2E** | Default: write | CI (PR check) | Real app, slowest |
+| **Smoke (agent-browser)** | For UI changes | CI (PR check) | Versioned browser tests |
+
+> For UI-heavy changes, consider adding agent-browser smoke tests.
+> These are versioned and reusable, replacing manual verification.
+
+### Database Isolation
+
+> **When schema changes are involved, consider database isolation.**
+
+| Migration Type | Shared DB OK? | Notes |
+|----------------|---------------|-------|
+| **Additive** (new table, nullable column, index) | ✅ Yes | Safe, no impact on others |
+| **Breaking** (drop, rename, type change) | ❌ No | Requires isolated database |
+
+**For breaking migrations:**
+1. Analyst flags `isolation_required: true` in spec
+2. Create isolated database for this work
+3. Test migration on isolated DB
+4. Document migration path for production
+
+> **For aix-factor**: Database isolation is STRICT. Always use isolated/seeded databases.
+
+### Infrastructure Impact
+
+> **Never bundle infrastructure changes with feature work.**
+
+Infrastructure changes (Docker, CI/CD, networking) have different risk profiles and require separate review.
+
+**If the feature involves infrastructure:**
+1. Create separate task for infrastructure changes
+2. Complete infrastructure changes first
+3. Then proceed with feature work
+
+**Infrastructure checklist:**
+- [ ] No Docker/Compose changes bundled with features
+- [ ] Volume names use dashes (not underscores)
+- [ ] Network changes tested in isolation
+
 ### Escalation Handling
 
 ```

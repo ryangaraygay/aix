@@ -47,6 +47,6 @@ Gates prevent AI from taking irreversible actions without consent.
 |------|----------|---------|
 | 1 | quick-fix | Fast path for trivial fixes (skip full analysis) |
 | 2 | feature | Full workflow with triage and multiple review loops |
-| 3 | refactor | Infrastructure and architecture changes |
+| 2 | refactor | Infrastructure, tech debt, and architectural changes |
 
 Run `/aix-init upgrade` to add workflows appropriate for your tier.

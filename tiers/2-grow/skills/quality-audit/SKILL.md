@@ -1,10 +1,11 @@
 ---
 name: quality-audit
 description: Code quality analysis including module sizes, cyclomatic complexity, and test coverage gaps.
+compatibility: Requires npm/pnpm, eslint. Optional - vitest/jest for coverage.
 metadata:
   invocation: both
   inputs: |
-    - scope: string (optional, default: all)
+    - scope: string (optional, all|backend|frontend, default: all)
     - coverage: boolean (optional, run tests with coverage, default: false)
   outputs: |
     - report: string (markdown format summary of code quality)
@@ -16,150 +17,250 @@ Evaluates the health and maintainability of the codebase.
 
 ## Features
 
-- **Module Size Enforcement**: Validates file lengths against limits
-- **Complexity Analysis**: Cyclomatic complexity checks
-- **Coverage Audit**: Highlights critical paths lacking tests
+- **Module Size Enforcement**: Validates file lengths against configured limits
+- **Complexity Analysis**: Cyclomatic complexity via ESLint rules
+- **Coverage Audit**: Highlights critical paths lacking test protection
 - **Tech Debt Identification**: Scans for TODOs and deprecated patterns
+- **Dead Code Detection**: Identifies unused exports and unreachable code
 
 ## Usage
 
-```
-/quality-audit
-/quality-audit --coverage
-```
+### Manual Execution
+
+\`\`\`bash
+# Run full audit
+./scripts/quality-audit.sh
+
+# Specific scope
+./scripts/quality-audit.sh --scope frontend
+
+# Include coverage analysis
+./scripts/quality-audit.sh --coverage
+\`\`\`
+
+### AI Invocation
+
+When invoked as a skill, the AI will:
+
+1. Run ESLint with complexity rules
+2. Check file sizes against limits
+3. Scan for TODO/FIXME/HACK comments
+4. Optionally run tests with coverage
+5. Generate severity-classified report
 
 ## Checks Performed
 
 ### 1. Module Size Limits
 
-Default thresholds (customize in constitution):
+Validates files against configurable limits:
 
 | Category | Soft Cap (Warn) | Hard Block |
 |----------|-----------------|------------|
-| Components/Pages | 500 lines | 750 lines |
+| Controllers/Pages/Components | 500 lines | 750 lines |
 | Hooks/Utils | 200 lines | 300 lines |
 | Services | 300 lines | 500 lines |
 
-```bash
-# Find large files
-find src -name "*.ts" -o -name "*.tsx" | xargs wc -l | sort -rn | head -20
-```
+Configure in your project's ESLint or custom config.
 
 ### 2. Complexity Analysis
 
-Check with ESLint:
+ESLint rules checked:
 
-```javascript
-// .eslintrc rules to enable
+\`\`\`javascript
 {
   "rules": {
     "complexity": ["warn", 10],
     "max-depth": ["warn", 4],
     "max-lines-per-function": ["warn", 50],
-    "max-params": ["warn", 4]
+    "max-nested-callbacks": ["warn", 3]
   }
 }
-```
+\`\`\`
 
 ### 3. Test Coverage
 
-```bash
-# Jest/Vitest
-npm test -- --coverage
+Coverage thresholds:
 
-# Check coverage thresholds
-# Recommend: 80% lines, 70% branches for critical paths
-```
+| Metric | Target |
+|--------|--------|
+| Statements | 80% |
+| Branches | 75% |
+| Functions | 80% |
+| Lines | 80% |
 
-Focus areas:
+Focus on critical paths:
+- Authentication/authorization
+- Payment processing
+- Data validation
 - Core business logic
-- API endpoints
-- Data transformations
-- Auth/security code
 
 ### 4. Tech Debt Markers
 
-Search for:
+Scans for:
+- \`TODO:\` - Planned improvements
+- \`FIXME:\` - Known bugs to fix
+- \`HACK:\` - Temporary workarounds
+- \`XXX:\` - Attention needed
+- \`@deprecated\` - Deprecated code
 
-```bash
-# TODOs and FIXMEs
-grep -rn "TODO\|FIXME\|HACK\|XXX" src/
+### 5. Dead Code Detection
 
-# Deprecated patterns
-grep -rn "@deprecated" src/
-
-# Console logs (should be removed in prod)
-grep -rn "console.log\|console.debug" src/
-```
-
-### 5. Code Duplication
-
-Look for:
-- Copy-pasted code blocks (3+ similar lines)
-- Repeated patterns that could be abstracted
-- Multiple implementations of same logic
+Identifies:
+- Unused exports
+- Unreachable code paths
+- Unused variables (beyond eslint basic checks)
+- Orphaned files
 
 ## Output Format
 
-```markdown
-# Quality Audit Report
+\`\`\`markdown
+## Quality Audit Report
 
-**Date**: 2026-01-19
-**Scope**: Full codebase
+**Scope:** all
+**Date:** 2025-01-20T10:30:00Z
 
-## Summary
+### Module Sizes
 
-| Metric | Value | Status |
-|--------|-------|--------|
-| Files > soft cap | 3 | ⚠️ |
-| Files > hard cap | 0 | ✅ |
-| Avg complexity | 4.2 | ✅ |
-| Test coverage | 72% | ⚠️ |
-| TODO count | 15 | ℹ️ |
+| File | Lines | Limit | Status |
+|------|-------|-------|--------|
+| src/components/Dashboard.tsx | 520 | 500 | ⚠️ WARN |
+| src/services/UserService.ts | 780 | 500 | ❌ BLOCK |
 
-## Large Files (Need Attention)
+### Complexity
 
-| File | Lines | Cap | Action |
-|------|-------|-----|--------|
-| src/components/Dashboard.tsx | 520 | 500 | Split into smaller components |
-| src/services/api.ts | 480 | 500 | Extract domain-specific services |
+| File | Function | Complexity | Limit |
+|------|----------|------------|-------|
+| src/utils/parser.ts | parseInput | 15 | 10 |
 
-## Complex Functions
+### Tech Debt
 
-| Function | File | Complexity | Recommendation |
-|----------|------|------------|----------------|
-| processOrder | orders.ts:45 | 15 | Break into smaller steps |
-| validateForm | form.ts:120 | 12 | Extract validation rules |
+| Type | Count | Files |
+|------|-------|-------|
+| TODO | 23 | 15 |
+| FIXME | 8 | 5 |
+| HACK | 3 | 2 |
 
-## Coverage Gaps
+### Coverage (if enabled)
 
-Critical paths missing tests:
-- `src/auth/login.ts` - 0% coverage
-- `src/api/payments.ts` - 30% coverage
+| Metric | Current | Target | Status |
+|--------|---------|--------|--------|
+| Statements | 72% | 80% | ⚠️ |
+| Branches | 68% | 75% | ⚠️ |
+| Functions | 85% | 80% | ✅ |
+| Lines | 73% | 80% | ⚠️ |
 
-## Tech Debt
+### Uncovered Critical Paths
 
-| Type | Count | Examples |
-|------|-------|----------|
-| TODOs | 15 | Various files |
-| console.log | 8 | Should remove for prod |
-| Deprecated | 2 | Old API usage |
+- \`src/auth/validateToken.ts\` - 0% coverage
+- \`src/payments/processCharge.ts\` - 45% coverage
 
-## Recommendations
+### Summary
 
-1. **High Priority**
-   - Add tests for auth/payments
-   - Split Dashboard.tsx
+- **Blocking:** 1 (file over hard limit)
+- **Warnings:** 5
+- **Tech Debt Items:** 34
 
-2. **Medium Priority**
-   - Reduce processOrder complexity
-   - Address TODO backlog
+### Recommendations
 
-3. **Low Priority**
-   - Remove console.log statements
-```
+1. Split UserService.ts into smaller modules
+2. Add tests for validateToken.ts
+3. Refactor parseInput to reduce complexity
+\`\`\`
 
-## References
+## Prerequisites
 
-- Constitution (Module size limits)
-- Testing guide
+### Required
+
+- Node.js with npm or pnpm
+- ESLint configured in project
+
+### Optional
+
+| Tool | Purpose | Installation |
+|------|---------|--------------|
+| vitest/jest | Coverage analysis | Already in most projects |
+| eslint-plugin-unused-imports | Dead code | \`npm i -D eslint-plugin-unused-imports\` |
+| madge | Circular dependencies | \`npm i -g madge\` |
+
+## Configuration
+
+### ESLint Setup
+
+\`\`\`javascript
+// eslint.config.js or .eslintrc
+{
+  "extends": ["eslint:recommended"],
+  "rules": {
+    "complexity": ["warn", 10],
+    "max-depth": ["warn", 4],
+    "max-lines": ["warn", { "max": 500, "skipBlankLines": true }],
+    "max-lines-per-function": ["warn", 50]
+  }
+}
+\`\`\`
+
+### Coverage Configuration
+
+\`\`\`javascript
+// vitest.config.ts
+export default {
+  test: {
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      thresholds: {
+        statements: 80,
+        branches: 75,
+        functions: 80,
+        lines: 80
+      }
+    }
+  }
+}
+\`\`\`
+
+## Integration
+
+### CI Pipeline
+
+\`\`\`yaml
+quality-audit:
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v4
+    - run: npm ci
+    - run: npm run lint
+    - run: npm run test -- --coverage
+    - run: ./scripts/quality-audit.sh
+\`\`\`
+
+### Pre-commit Hook
+
+\`\`\`bash
+# .husky/pre-commit
+# Check only staged files
+FILES=\$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|tsx|js|jsx)\$')
+if [ -n "\$FILES" ]; then
+  npx eslint \$FILES
+fi
+\`\`\`
+
+## Refactoring Guidelines
+
+When files exceed limits, refactor at **behavioral seams**:
+
+1. **Extract by responsibility** - One module, one job
+2. **Extract by data type** - Group operations on same data
+3. **Extract utilities** - Pure functions with no side effects
+4. **Extract hooks** - Reusable React logic
+
+**Don't:**
+- Split arbitrarily at line counts
+- Create too many tiny modules
+- Over-abstract for hypothetical needs
+
+## See Also
+
+- [Module Architecture Guide](../../docs/guides/module-architecture.md)
+- [Testing Guide](../../docs/guides/testing.md)
+- [Audit Framework](../../docs/guides/audit-framework.md)
