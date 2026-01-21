@@ -568,8 +568,9 @@ AIX must work standalone. aix-factor adds value on top.
 - [x] AIX framework exists (in this repo, needs cleanup)
 - [x] Vision doc written
 - [x] Depot validated with ebblyn/.ai
-- [ ] **Phase 0**: Extract clean AIX from ebblyn/.ai
-- [ ] Phase 1-7: aix-factor
+- [x] **Phase 0**: Extract clean AIX from ebblyn/.ai ✅
+- [x] **Phase 1**: Create aix-factor repo, copy AIX ✅
+- [ ] Phase 2-7: aix-factor orchestrator and beyond
 
 ---
 
