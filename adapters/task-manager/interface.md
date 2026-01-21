@@ -1,5 +1,8 @@
 # Task Manager Interface
 
+> **Status**: Specification only. No implementations exist in AIX yet.
+> This interface defines the contract; implementations live in your project or aix-factor.
+
 AIX defines a provider-agnostic interface for task management. Implementations can target different backends (GitHub Issues, Linear, Jira, custom boards, etc.).
 
 ## Overview
@@ -277,6 +280,9 @@ task:
 
 ## Implementing an Adapter
 
+> **For implementers**: Follow this pattern when creating a new task manager adapter.
+> Currently, the only reference implementation is [ebblyn-ecosystem/.ai/skills/ebblyn-*](https://github.com/ebblyn/ebblyn-ecosystem).
+
 ### Required Files
 
 ```
@@ -412,22 +418,23 @@ task_manager:
 
 ---
 
-## Provider Comparison
+## Provider Comparison (Planned)
+
+> **Note**: No implementations exist yet in AIX. This table shows theoretical capability.
+> The only working implementation is Ebblyn Boards in [ebblyn-ecosystem](https://github.com/ebblyn/ebblyn-ecosystem).
 
 | Feature | GitHub | Linear | Jira | Ebblyn |
 |---------|--------|--------|------|--------|
-| get-task | ✅ | ✅ | ✅ | ✅ |
-| create-task | ✅ | ✅ | ✅ | ✅ |
-| update-task | ✅ | ✅ | ✅ | ✅ |
-| start-task | ✅ | ✅ | ✅ | ✅ |
-| close-task | ✅ | ✅ | ✅ | ✅ |
-| comment-task | ✅ | ✅ | ✅ | ✅ |
-| priorities | ⚠️ | ✅ | ⚠️ | ✅ |
-| relate-task | ⚠️ | ✅ | ✅ | ✅ |
-| Blocking analysis | ❌ | ✅ | ⚠️ | ✅ |
-| Batch operations | ❌ | ✅ | ✅ | ✅ |
+| get-task | 🔮 | 🔮 | 🔮 | ✅ |
+| create-task | 🔮 | 🔮 | 🔮 | ✅ |
+| update-task | 🔮 | 🔮 | 🔮 | ✅ |
+| start-task | 🔮 | 🔮 | 🔮 | ✅ |
+| close-task | 🔮 | 🔮 | 🔮 | ✅ |
+| comment-task | 🔮 | 🔮 | 🔮 | ✅ |
+| priorities | 🔮 | 🔮 | 🔮 | ✅ |
+| relate-task | 🔮 | 🔮 | 🔮 | ✅ |
 
-Legend: ✅ Full support | ⚠️ Partial/workaround | ❌ Not supported
+Legend: ✅ Implemented | 🔮 Planned/Possible
 
 ---
 
