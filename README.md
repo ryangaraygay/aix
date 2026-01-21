@@ -38,10 +38,10 @@ aix grows with your project:
 
 | Tier | Name | When | What You Get |
 |------|------|------|--------------|
-| 0 | **Seed** | Starting out | Constitution, 3 roles, 1 workflow |
-| 1 | **Sprout** | Patterns emerging | + hooks, tester, docs, quick-fix workflow |
-| 2 | **Grow** | Team/CI needed | + GitHub Actions, orchestrator, audits |
-| 3 | **Scale** | Complex/parallel | + worktrees, strategy docs, task management |
+| 0 | **Seed** | Starting out | Constitution, 3 roles, 1 workflow, compaction hooks |
+| 1 | **Sprout** | Patterns emerging | + tester, docs, quick-fix workflow, git hooks |
+| 2 | **Grow** | Team/CI needed | + GitHub Actions, orchestrator, audits, agent-browser |
+| 3 | **Scale** | Complex/parallel | + worktrees, validate-bash hook, advanced audits |
 
 ---
 
@@ -82,44 +82,28 @@ The init skill will:
 
 ---
 
-## Installation Roadmap
+## Adoption
 
-Currently aix requires cloning the framework locally. Future installation methods are planned:
-
-| Phase | Method | Status |
-|-------|--------|--------|
-| **Now** | Clone repo, run `bootstrap.sh` | Current |
-| **Later** | `npm install -g @ryangaraygay/aix` | After validation |
-| **Public** | `curl -fsSL https://aix.dev/install.sh \| sh` | When repo is public |
-
-### Current Method (Clone)
+**Most projects:** Bootstrap copies files into your project (simple, self-contained)
 
 ```bash
-# 1. Clone the aix framework
-git clone git@github.com:ryangaraygay/aix.git ~/Gitea/aix
-
-# 2. In your project, run bootstrap
+# Current (while private)
+git clone git@github.com:ebblyn/aix.git ~/tools/aix
 cd my-project
-~/Gitea/aix/bootstrap.sh
+~/tools/aix/bootstrap.sh
+
+# Future (when public)
+curl -fsSL https://aix.dev/install | bash
 ```
 
-### Future: npm Global (Planned)
+**AIX contributors:** Submodule for tight coupling
 
 ```bash
-# Install globally
-npm install -g @ryangaraygay/aix
-
-# Use anywhere
-aix init
-aix upgrade
+git submodule add git@github.com:ebblyn/aix.git .aix
+./.aix/adapters/claude-code/generate.sh 0
 ```
 
-### Future: Curl Bootstrap (When Public)
-
-```bash
-# One-liner to bootstrap any project
-curl -fsSL https://aix.dev/install.sh | sh
-```
+See **[docs/adoption.md](docs/adoption.md)** for full details on adoption paths, version management, and decision matrix.
 
 ---
 
