@@ -2,14 +2,19 @@
 #
 # Post-Compact Hook (SessionStart with "compact" matcher)
 #
-# Reads .aix-handoff.md and outputs JSON with additionalContext for Claude Code
+# Reads .ai-handoff.md and outputs JSON with additionalContext for Claude Code
 # to inject into the session context after compaction.
 #
+# Claude Code Hook Events:
+#   - Trigger: SessionStart (with matcher for compaction)
+#   - Output: JSON with additionalContext
+#
 # Format: {"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": "..."}}
+#
 
 set -euo pipefail
 
-HANDOFF_FILE=".aix-handoff.md"
+HANDOFF_FILE=".ai-handoff.md"
 
 # Build the context string
 build_context() {
@@ -31,7 +36,7 @@ build_context() {
         cat "$HANDOFF_FILE"
         echo ""
     else
-        echo "### WARNING: No .aix-handoff.md found"
+        echo "### WARNING: No .ai-handoff.md found"
         echo ""
         echo "Gather state manually:"
         echo ""
@@ -49,13 +54,7 @@ build_context() {
 CONTEXT=$(build_context)
 
 # Use jq to properly escape the string for JSON
-if command -v jq &> /dev/null; then
-    ESCAPED_CONTEXT=$(printf '%s' "$CONTEXT" | jq -Rs '.')
-else
-    # Fallback: basic escaping
-    ESCAPED_CONTEXT=$(printf '%s' "$CONTEXT" | sed 's/\\/\\\\/g; s/"/\\"/g; s/$/\\n/' | tr -d '\n')
-    ESCAPED_CONTEXT="\"$ESCAPED_CONTEXT\""
-fi
+ESCAPED_CONTEXT=$(printf '%s' "$CONTEXT" | jq -Rs '.')
 
 # Output JSON to stdout for Claude Code to inject into context
 printf '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":%s}}\n' "$ESCAPED_CONTEXT"

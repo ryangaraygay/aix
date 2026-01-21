@@ -2,14 +2,17 @@
 #
 # PreCompact Hook - Save workflow state before context compaction
 #
-# Updates .aix-handoff.md with a snapshot of current git state.
+# Updates .ai-handoff.md with a snapshot section containing current git state.
 # The post-compact hook reads this file to restore context after compaction.
 #
-# This hook is called by Claude Code before context compaction occurs.
+# Claude Code Hook Events:
+#   - Trigger: PreCompact
+#   - Output: Updates .ai-handoff.md file
+#
 
 set -euo pipefail
 
-HANDOFF_FILE=".aix-handoff.md"
+HANDOFF_FILE=".ai-handoff.md"
 SNAPSHOT_START="<!-- COMPACTION_SNAPSHOT_START -->"
 SNAPSHOT_END="<!-- COMPACTION_SNAPSHOT_END -->"
 
@@ -23,15 +26,20 @@ GIT_STATUS=$(git status --short 2>/dev/null || echo "(no changes)")
 UNCOMMITTED_COUNT=$(echo "$GIT_STATUS" | grep -c '^' 2>/dev/null || echo "0")
 RECENT_COMMITS=$(git log --oneline -5 2>/dev/null || echo "(no commits)")
 
-# Check for existing PR
+# Check for existing PR (requires gh CLI)
 EXISTING_PR="[]"
-if command -v gh &> /dev/null; then
+if command -v gh >/dev/null 2>&1; then
     EXISTING_PR=$(gh pr list --head "$CURRENT_BRANCH" --json number,title,url 2>/dev/null || echo "[]")
 fi
 
 # Capture worktree context
 REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 WORKTREE_NAME=$(basename "$REPO_ROOT")
+MAIN_REPO=$(git worktree list --porcelain 2>/dev/null | awk '/^worktree / {print $2; exit}' || echo "")
+WORKTREE_RELATIVE="."
+if [ -n "$MAIN_REPO" ] && [ "$REPO_ROOT" != "$MAIN_REPO" ]; then
+    WORKTREE_RELATIVE="${REPO_ROOT#"$MAIN_REPO"/}"
+fi
 
 # Update handoff file with snapshot
 update_handoff() {
@@ -61,6 +69,7 @@ EOF
         printf '- Trigger: %s\n' "$TRIGGER"
         printf '- Branch: %s\n' "$CURRENT_BRANCH"
         printf '- Worktree: %s\n' "$WORKTREE_NAME"
+        printf '- Worktree Path: %s\n' "$WORKTREE_RELATIVE"
         printf '- Uncommitted Files: %s\n\n' "$UNCOMMITTED_COUNT"
         printf '### Uncommitted Changes\n```\n%s\n```\n\n' "$GIT_STATUS"
         printf '### Recent Commits\n```\n%s\n```\n\n' "$RECENT_COMMITS"
