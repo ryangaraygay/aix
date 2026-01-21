@@ -775,11 +775,12 @@ Generic patterns that need abstraction layer for multiple providers (Ebblyn, Lin
 - [ ] Extract performance audit → `tiers/2-grow/skills/` or `tiers/3-scale/`
 - [ ] Extract optional audits: accessibility, privacy, cognitive, delight, resilience → `tiers/3-scale/`
 
-### Phase 0b: Task Management Interfaces
+### Phase 0b: Task Management Interfaces ✅ COMPLETE
 
-- [ ] Define `TaskManager` interface → `adapters/task-manager/interface.md`
-- [ ] Define skill templates that use interface (provider-agnostic)
-- [ ] Document: implementations stay in aix-factor or user's adapter
+- [x] Define `TaskManager` interface → `adapters/task-manager/interface.md`
+- [x] Define skill templates that use interface (provider-agnostic)
+- [x] Document: implementations stay in aix-factor or user's adapter
+- [x] Create skills `_index.md` following Agent Skills specification
 
 ### Phase 0c: Roles ✅ COMPLETE
 
@@ -888,9 +889,9 @@ The ebblyn/.ai system represents **~9,000+ lines of battle-tested patterns** tha
 - ✅ Phase 0c: All roles extracted and expanded (debug, product-designer, + 7 existing)
 - ✅ Phase 0d: Workflows enhanced (refactor workflow, TDD enforcement, verification strategy, database isolation, infrastructure impact)
 - ✅ Phase 0a (partial): Core skills extracted (wrap-up, promote, pr-merged, agent-browser) + audit framework with security/quality audits
+- ✅ Phase 0b: Task management interface defined + skills index created (following Agent Skills spec)
 
 **Remaining:**
 - Phase 0a: deploy skill, reflect skill, performance audit, optional audits (tier 3)
-- Phase 0b: Task management interface
 - Phase 0e: Hooks (compaction)
 - Phase 0f: Documentation (tier READMEs, guides)
