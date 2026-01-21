@@ -1,13 +1,13 @@
-# Claude Code Hooks
+# Tier 3 Hooks - Safety & Validation
 
-Hooks extend Claude Code behavior at specific lifecycle events. They're shell scripts that receive JSON input and output JSON responses.
+Advanced hooks for enterprise safety requirements.
+
+> **Note:** Compaction hooks (pre-compact.sh, post-compact.sh) are now in [Tier 0](../../0-seed/hooks/_index.md) as foundational capabilities.
 
 ## Available Hooks
 
 | Hook | Event | Purpose |
 |------|-------|---------|
-| [pre-compact.sh](./pre-compact.sh) | PreCompact | Save workflow state before context compaction |
-| [post-compact.sh](./post-compact.sh) | SessionStart | Restore context after compaction |
 | [validate-bash.sh](./validate-bash.sh) | PreToolUse | Block destructive database commands |
 
 ## Installation

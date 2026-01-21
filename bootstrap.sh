@@ -43,6 +43,11 @@ mkdir -p "$REPO_ROOT/docs"
 echo "Copying Tier 0 (Seed) files..."
 cp -r "$AIX_FRAMEWORK/tiers/0-seed/"* "$REPO_ROOT/.aix/"
 
+# Make hooks executable
+if [ -d "$REPO_ROOT/.aix/hooks" ]; then
+    chmod +x "$REPO_ROOT/.aix/hooks/"*.sh 2>/dev/null || true
+fi
+
 # Copy doc templates
 echo "Copying document templates..."
 cp "$AIX_FRAMEWORK/docs/templates/"*.md "$REPO_ROOT/docs/"
