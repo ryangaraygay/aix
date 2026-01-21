@@ -87,6 +87,7 @@ if [ -d "$AIX_DIR/skills" ] || [ -d "$AIX_DIR/$TIER_PATH/skills" ] 2>/dev/null; 
 fi
 
 # Generate settings.json with hooks configuration
+# New format: {"EventName": [{"matcher": {...}, "hooks": [{"type": "command", "command": "..."}]}]}
 SETTINGS_FILE="$CLAUDE_DIR/settings.json"
 
 if [ -d "$HOOKS_DIR" ] && [ "$(ls -A "$HOOKS_DIR" 2>/dev/null)" ]; then
@@ -97,17 +98,17 @@ if [ -d "$HOOKS_DIR" ] && [ "$(ls -A "$HOOKS_DIR" 2>/dev/null)" ]; then
 
     # Check for pre-compact hook
     if [ -f "$HOOKS_DIR/pre-compact.sh" ]; then
-        HOOKS_JSON="$HOOKS_JSON\"PreCompact\": [{\"type\": \"command\", \"command\": \"$HOOKS_CMD_PATH/pre-compact.sh\"}],"
+        HOOKS_JSON="$HOOKS_JSON\"PreCompact\": [{\"matcher\": {}, \"hooks\": [{\"type\": \"command\", \"command\": \"$HOOKS_CMD_PATH/pre-compact.sh\"}]}],"
     fi
 
-    # Check for post-compact hook (SessionStart with matcher)
+    # Check for post-compact hook (SessionStart with matcher for compaction)
     if [ -f "$HOOKS_DIR/post-compact.sh" ]; then
-        HOOKS_JSON="$HOOKS_JSON\"SessionStart\": [{\"type\": \"command\", \"command\": \"$HOOKS_CMD_PATH/post-compact.sh\", \"matcher\": \"compact\"}],"
+        HOOKS_JSON="$HOOKS_JSON\"SessionStart\": [{\"matcher\": {\"sessionStartReason\": \"compact\"}, \"hooks\": [{\"type\": \"command\", \"command\": \"$HOOKS_CMD_PATH/post-compact.sh\"}]}],"
     fi
 
-    # Check for validate-bash hook (PreToolUse)
+    # Check for validate-bash hook (PreToolUse for Bash)
     if [ -f "$HOOKS_DIR/validate-bash.sh" ]; then
-        HOOKS_JSON="$HOOKS_JSON\"PreToolUse\": [{\"type\": \"command\", \"command\": \"$HOOKS_CMD_PATH/validate-bash.sh\", \"toolName\": \"Bash\"}],"
+        HOOKS_JSON="$HOOKS_JSON\"PreToolUse\": [{\"matcher\": {\"tools\": [\"Bash\"]}, \"hooks\": [{\"type\": \"command\", \"command\": \"$HOOKS_CMD_PATH/validate-bash.sh\"}]}],"
     fi
 
     # Remove trailing comma and wrap
@@ -116,7 +117,7 @@ if [ -d "$HOOKS_DIR" ] && [ "$(ls -A "$HOOKS_DIR" 2>/dev/null)" ]; then
     if [ -n "$HOOKS_JSON" ]; then
         cat > "$SETTINGS_FILE" << EOF
 {
-  "\$schema": "https://claude.ai/schemas/settings.json",
+  "\$schema": "https://json.schemastore.org/claude-code-settings.json",
   "hooks": {
     $HOOKS_JSON
   }
@@ -129,7 +130,7 @@ else
     if [ ! -f "$SETTINGS_FILE" ]; then
         cat > "$SETTINGS_FILE" << EOF
 {
-  "\$schema": "https://claude.ai/schemas/settings.json"
+  "\$schema": "https://json.schemastore.org/claude-code-settings.json"
 }
 EOF
         echo "✓ Created .claude/settings.json (no hooks)"
