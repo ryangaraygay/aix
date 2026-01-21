@@ -758,21 +758,22 @@ Generic patterns that need abstraction layer for multiple providers (Ebblyn, Lin
 ### Phase 0a: Skills Extraction
 
 **Core Skills (AIX-local):**
-- [ ] Extract `wrap-up` skill → `tiers/2-grow/skills/wrap-up/` (interactive mode only)
-- [ ] Extract `promote` skill → `tiers/2-grow/skills/promote/` (review for generalization)
+- [x] Extract `wrap-up` skill → `tiers/2-grow/skills/wrap-up/` (interactive mode only)
+- [x] Extract `promote` skill → `tiers/2-grow/skills/promote/` (review for generalization)
 - [ ] Extract `deploy` skill → `tiers/2-grow/skills/deploy/` (review for generalization)
-- [ ] Extract `pr-merged` skill → `tiers/2-grow/skills/pr-merged/`
+- [x] Extract `pr-merged` skill → `tiers/2-grow/skills/pr-merged/`
 - [ ] Extract `reflect` skill → `tiers/3-scale/skills/reflect/` (later: system self-improvement)
 
 **Browser Automation (replaces manual verification gate):**
-- [ ] Extract `agent-browser` → `tiers/2-grow/skills/agent-browser/`
-- [ ] Document: `npm install` for Playwright, Depot `--resume` preserves install
+- [x] Extract `agent-browser` → `tiers/2-grow/skills/agent-browser/`
+- [x] Document: `npm install` for Playwright, Depot `--resume` preserves install
 - [ ] Create smoke test templates (versioned, reusable browser tests)
 
 **Audit Framework:**
-- [ ] Create audit framework base → `tiers/2-grow/skills/audit-framework/`
-- [ ] Extract core audits: quality, security, performance
-- [ ] Extract optional audits: accessibility, privacy, cognitive, delight, resilience → extras/
+- [x] Create audit framework base → `docs/guides/audit-framework.md`
+- [x] Extract core audits: quality, security → `tiers/2-grow/skills/`
+- [ ] Extract performance audit → `tiers/2-grow/skills/` or `tiers/3-scale/`
+- [ ] Extract optional audits: accessibility, privacy, cognitive, delight, resilience → `tiers/3-scale/`
 
 ### Phase 0b: Task Management Interfaces
 
@@ -780,29 +781,29 @@ Generic patterns that need abstraction layer for multiple providers (Ebblyn, Lin
 - [ ] Define skill templates that use interface (provider-agnostic)
 - [ ] Document: implementations stay in aix-factor or user's adapter
 
-### Phase 0c: Roles
+### Phase 0c: Roles ✅ COMPLETE
 
 **New Roles:**
-- [ ] Create `debug` role → `tiers/3-scale/roles/debug.md`
-- [ ] Create `product-designer` role → `tiers/3-scale/roles/product-designer.md`
+- [x] Create `debug` role → `tiers/3-scale/roles/debug.md`
+- [x] Create `product-designer` role → `tiers/3-scale/roles/product-designer.md`
 
 **Expand Existing (leverage ebblyn/.ai comprehensive content):**
-- [ ] Expand `analyst` (135→400+ lines) - strip Ebblyn-specific, keep patterns
-- [ ] Expand `coder` (165→300+ lines)
-- [ ] Expand `reviewer` (230→350+ lines)
-- [ ] Expand `tester` (190→300+ lines)
-- [ ] Expand `docs` (215→300+ lines)
-- [ ] Expand `triage` (160→200+ lines)
-- [ ] Expand `orchestrator` (160→300+ lines)
+- [x] Expand `analyst` (135→400+ lines) - strip Ebblyn-specific, keep patterns
+- [x] Expand `coder` (165→300+ lines)
+- [x] Expand `reviewer` (230→350+ lines)
+- [x] Expand `tester` (190→300+ lines)
+- [x] Expand `docs` (215→300+ lines)
+- [x] Expand `triage` (160→200+ lines)
+- [x] Expand `orchestrator` (160→300+ lines)
 
-### Phase 0d: Workflows
+### Phase 0d: Workflows ✅ COMPLETE
 
-- [ ] Create `refactor` workflow → `tiers/2-grow/workflows/refactor.md`
-- [ ] Add TDD enforcement example to `quick-fix.md`
-- [ ] Add database isolation section to `feature.md` (note: strict for aix-factor)
-- [ ] Add infrastructure impact analysis to `feature.md`
-- [ ] Update `_index.md` with loop state tracking format
-- [ ] Add verification strategy section to `feature.md` (test run strategy table)
+- [x] Create `refactor` workflow → `tiers/2-grow/workflows/refactor.md`
+- [x] Add TDD enforcement example to `quick-fix.md`
+- [x] Add database isolation section to `feature.md` (note: strict for aix-factor)
+- [x] Add infrastructure impact analysis to `feature.md`
+- [x] Update `_index.md` with loop state tracking format
+- [x] Add verification strategy section to `feature.md` (test run strategy table)
 
 ### Phase 0e: Hooks & Scripts
 
@@ -820,12 +821,12 @@ Generic patterns that need abstraction layer for multiple providers (Ebblyn, Lin
 
 ## Extraction Priority Matrix
 
-| Priority | Items | Rationale |
-|----------|-------|-----------|
-| **P0** | ~~debug role~~✅, ~~product-designer role~~✅, refactor workflow | Core gaps blocking real usage |
-| **P1** | agent-browser skill, verification strategy in workflows | Replaces manual gate, enables autonomous |
-| **P2** | Core audits (quality/security/performance), task manager interface | Quality, extensibility |
-| **P3** | Remaining skills, optional audits, documentation | Polish |
+| Priority | Items | Status |
+|----------|-------|--------|
+| **P0** | ~~debug role~~✅, ~~product-designer role~~✅, ~~refactor workflow~~✅ | ✅ COMPLETE |
+| **P1** | ~~agent-browser skill~~✅, ~~verification strategy in workflows~~✅ | ✅ COMPLETE |
+| **P2** | ~~Core audits (quality/security)~~✅, performance audit, task manager interface | 🔄 In Progress |
+| **P3** | Remaining skills, optional audits, documentation | ⏳ Pending |
 
 ---
 
@@ -885,5 +886,11 @@ The ebblyn/.ai system represents **~9,000+ lines of battle-tested patterns** tha
 
 **Completed:**
 - ✅ Phase 0c: All roles extracted and expanded (debug, product-designer, + 7 existing)
+- ✅ Phase 0d: Workflows enhanced (refactor workflow, TDD enforcement, verification strategy, database isolation, infrastructure impact)
+- ✅ Phase 0a (partial): Core skills extracted (wrap-up, promote, pr-merged, agent-browser) + audit framework with security/quality audits
 
-**Next step**: Phase 0d (Workflows) - create refactor workflow, add verification strategy to feature.md.
+**Remaining:**
+- Phase 0a: deploy skill, reflect skill, performance audit, optional audits (tier 3)
+- Phase 0b: Task management interface
+- Phase 0e: Hooks (compaction)
+- Phase 0f: Documentation (tier READMEs, guides)
