@@ -806,10 +806,10 @@ Generic patterns that need abstraction layer for multiple providers (Ebblyn, Lin
 - [x] Update `_index.md` with loop state tracking format
 - [x] Add verification strategy section to `feature.md` (test run strategy table)
 
-### Phase 0e: Hooks & Scripts
+### Phase 0e: Hooks & Scripts ✅ COMPLETE
 
-- [ ] Add compaction hooks → `tiers/3-scale/hooks/`
-- [ ] Verify worktree scripts work standalone
+- [x] Add compaction hooks → `tiers/3-scale/hooks/`
+- [x] Verify worktree scripts work standalone
 
 ### Phase 0f: Documentation
 
@@ -890,8 +890,8 @@ The ebblyn/.ai system represents **~9,000+ lines of battle-tested patterns** tha
 - ✅ Phase 0d: Workflows enhanced (refactor workflow, TDD enforcement, verification strategy, database isolation, infrastructure impact)
 - ✅ Phase 0a (partial): Core skills extracted (wrap-up, promote, pr-merged, agent-browser) + audit framework with security/quality audits
 - ✅ Phase 0b: Task management interface defined + skills index created (following Agent Skills spec)
+- ✅ Phase 0e: Compaction hooks (pre-compact, post-compact, validate-bash) + worktree scripts verified standalone
 
 **Remaining:**
 - Phase 0a: deploy skill, reflect skill, performance audit, optional audits (tier 3)
-- Phase 0e: Hooks (compaction)
 - Phase 0f: Documentation (tier READMEs, guides)
