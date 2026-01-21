@@ -764,9 +764,10 @@ Generic patterns that need abstraction layer for multiple providers (Ebblyn, Lin
 - [ ] Extract `pr-merged` skill → `tiers/2-grow/skills/pr-merged/`
 - [ ] Extract `reflect` skill → `tiers/3-scale/skills/reflect/` (later: system self-improvement)
 
-**Browser Automation:**
-- [ ] Extract `agent-browser` → `tiers/3-scale/skills/agent-browser/`
-- [ ] Document: Playwright dependency, Depot `--resume` pattern for persistence
+**Browser Automation (replaces manual verification gate):**
+- [ ] Extract `agent-browser` → `tiers/2-grow/skills/agent-browser/`
+- [ ] Document: `npm install` for Playwright, Depot `--resume` preserves install
+- [ ] Create smoke test templates (versioned, reusable browser tests)
 
 **Audit Framework:**
 - [ ] Create audit framework base → `tiers/2-grow/skills/audit-framework/`
@@ -797,11 +798,11 @@ Generic patterns that need abstraction layer for multiple providers (Ebblyn, Lin
 ### Phase 0d: Workflows
 
 - [ ] Create `refactor` workflow → `tiers/2-grow/workflows/refactor.md`
-- [ ] Add manual verification gate to `feature.md` (AIX-local only, conditional)
 - [ ] Add TDD enforcement example to `quick-fix.md`
 - [ ] Add database isolation section to `feature.md` (note: strict for aix-factor)
 - [ ] Add infrastructure impact analysis to `feature.md`
 - [ ] Update `_index.md` with loop state tracking format
+- [ ] Add verification strategy section to `feature.md` (test run strategy table)
 
 ### Phase 0e: Hooks & Scripts
 
@@ -821,10 +822,39 @@ Generic patterns that need abstraction layer for multiple providers (Ebblyn, Lin
 
 | Priority | Items | Rationale |
 |----------|-------|-----------|
-| **P0** | debug role, product-designer role, refactor workflow | Core gaps blocking real usage |
-| **P1** | Core audits (quality/security/performance), expand analyst/reviewer/coder | Quality improvement |
-| **P2** | Task manager interface, agent-browser | Extensibility, automation |
+| **P0** | ~~debug role~~✅, ~~product-designer role~~✅, refactor workflow | Core gaps blocking real usage |
+| **P1** | agent-browser skill, verification strategy in workflows | Replaces manual gate, enables autonomous |
+| **P2** | Core audits (quality/security/performance), task manager interface | Quality, extensibility |
 | **P3** | Remaining skills, optional audits, documentation | Polish |
+
+---
+
+## Verification Strategy
+
+> **Decision**: Replace manual verification gate with agent-browser automated smoke tests.
+> Tests are versioned, reusable, and run the same in AIX-local and aix-factor.
+
+### Test Run Strategy
+
+| Test Type | When to Write | When to Run | Notes |
+|-----------|---------------|-------------|-------|
+| **Unit** | ALWAYS | Local (before PR) | Fast, no deps |
+| **Component** | ALWAYS | Local (before PR) | Mocked, fast |
+| **Integration** | Default: write | CI (PR check) | Real DB, slower |
+| **E2E** | Default: write | CI (PR check) | Real app, slowest |
+| **Smoke (agent-browser)** | For UI changes | CI (PR check) | Versioned browser tests |
+
+### Preview Deploy (Optional)
+
+For projects with preview infrastructure:
+- Deploy preview URL on PR
+- Run E2E/smoke tests against preview
+- Link in PR for async human review (optional)
+
+### Deferred (Roadmap)
+
+- [ ] **Visual regression testing**: Screenshots saved to repo, diff on PR
+- [ ] **Workflow integration**: Automatic agent-browser smoke tests in feature workflow
 
 ---
 
@@ -832,7 +862,7 @@ Generic patterns that need abstraction layer for multiple providers (Ebblyn, Lin
 
 | Feature | AIX-local | aix-factor |
 |---------|-----------|------------|
-| **Manual verification gate** | ✅ Interactive | ❌ Autonomous |
+| **Verification** | Interactive OR agent-browser | agent-browser (autonomous) |
 | **Database isolation** | Optional (shared OK) | **Strict** (seeding required) |
 | **wrap-up skill** | ✅ Useful | ❌ N/A |
 | **dev-start skill** | ✅ Useful | ❌ N/A |
@@ -849,7 +879,11 @@ The ebblyn/.ai system represents **~9,000+ lines of battle-tested patterns** tha
 **Key insights:**
 1. Most of ebblyn/.ai IS generic - Ebblyn-specific parts are isolated in skills
 2. Roles should leverage comprehensive ebblyn content (strip specifics, keep patterns)
-3. AIX-local vs aix-factor have different requirements (interactive vs autonomous)
+3. AIX-local vs aix-factor use same verification strategy (agent-browser replaces manual gate)
 4. Depot session persistence (`--resume`) solves dependency installation for agent-browser
+5. Test run strategy: unit/component local, integration/e2e/smoke in CI
 
-**Next step**: Begin Phase 0c with roles - extract `debug` and `product-designer`, then expand existing roles using ebblyn/.ai as source.
+**Completed:**
+- ✅ Phase 0c: All roles extracted and expanded (debug, product-designer, + 7 existing)
+
+**Next step**: Phase 0d (Workflows) - create refactor workflow, add verification strategy to feature.md.
