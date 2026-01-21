@@ -24,6 +24,7 @@ Additions for established projects with CI/CD needs and team coordination.
 | Workflow | Purpose |
 |----------|---------|
 | [feature](workflows/feature.md) | Full workflow with triage, spec, impl loop, docs, PR |
+| [refactor](workflows/refactor.md) | Infrastructure and architecture changes |
 
 ### CI Templates
 
@@ -39,8 +40,14 @@ Auto-selected based on `docs/tech-stack.md` Runtime:
 
 | Skill | Purpose |
 |-------|---------|
+| [agent-browser](skills/agent-browser/) | Browser automation for smoke tests and verification |
+| [wrap-up](skills/wrap-up/) | Session wrap-up check before ending |
+| [promote](skills/promote/) | Create release branch from dev with version suggestion |
+| [pr-merged](skills/pr-merged/) | Post-PR merge summary and handoff |
+| [deploy](skills/deploy/) | Deploy to target environment with safety checks |
 | [security-audit](skills/security-audit/) | Scan for vulnerabilities, secrets, OWASP issues |
 | [quality-audit](skills/quality-audit/) | Module sizes, complexity, test coverage |
+| [performance-audit](skills/performance-audit/) | Bundle sizes, API latency, database efficiency |
 
 ## Installation
 

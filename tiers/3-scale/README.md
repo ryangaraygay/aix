@@ -33,6 +33,18 @@ Additions for complex projects with parallel development and long-running AI ses
 |------|---------|
 | [pre-compact.sh](hooks/pre-compact.sh) | Save workflow state before context compaction |
 | [post-compact.sh](hooks/post-compact.sh) | Restore context after compaction |
+| [validate-bash.sh](hooks/validate-bash.sh) | Block destructive database commands |
+
+### Skills
+
+| Skill | Purpose |
+|-------|---------|
+| [reflect](skills/reflect/) | Session retrospective with improvement proposals |
+| [accessibility-audit](skills/accessibility-audit/) | WCAG AA compliance, keyboard nav, focus states |
+| [privacy-audit](skills/privacy-audit/) | PII detection, local-first validation, data retention |
+| [cognitive-audit](skills/cognitive-audit/) | Cognitive load, Miller's Law, jargon analysis |
+| [delight-audit](skills/delight-audit/) | Brand voice, empty states, micro-interactions |
+| [resilience-audit](skills/resilience-audit/) | Offline capability, state recovery, graceful degradation |
 
 ### Strategy Docs
 

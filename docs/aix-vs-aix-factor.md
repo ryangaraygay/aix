@@ -755,25 +755,25 @@ Generic patterns that need abstraction layer for multiple providers (Ebblyn, Lin
 
 ## Phase 0 Extraction Checklist
 
-### Phase 0a: Skills Extraction
+### Phase 0a: Skills Extraction ✅ COMPLETE
 
 **Core Skills (AIX-local):**
 - [x] Extract `wrap-up` skill → `tiers/2-grow/skills/wrap-up/` (interactive mode only)
 - [x] Extract `promote` skill → `tiers/2-grow/skills/promote/` (review for generalization)
-- [ ] Extract `deploy` skill → `tiers/2-grow/skills/deploy/` (review for generalization)
+- [x] Extract `deploy` skill → `tiers/2-grow/skills/deploy/` (review for generalization)
 - [x] Extract `pr-merged` skill → `tiers/2-grow/skills/pr-merged/`
-- [ ] Extract `reflect` skill → `tiers/3-scale/skills/reflect/` (later: system self-improvement)
+- [x] Extract `reflect` skill → `tiers/3-scale/skills/reflect/` (system self-improvement)
 
 **Browser Automation (replaces manual verification gate):**
 - [x] Extract `agent-browser` → `tiers/2-grow/skills/agent-browser/`
 - [x] Document: `npm install` for Playwright, Depot `--resume` preserves install
-- [ ] Create smoke test templates (versioned, reusable browser tests)
+- [ ] Create smoke test templates (versioned, reusable browser tests) - deferred to roadmap
 
 **Audit Framework:**
 - [x] Create audit framework base → `docs/guides/audit-framework.md`
 - [x] Extract core audits: quality, security → `tiers/2-grow/skills/`
-- [ ] Extract performance audit → `tiers/2-grow/skills/` or `tiers/3-scale/`
-- [ ] Extract optional audits: accessibility, privacy, cognitive, delight, resilience → `tiers/3-scale/`
+- [x] Extract performance audit → `tiers/2-grow/skills/performance-audit/`
+- [x] Extract optional audits: accessibility, privacy, cognitive, delight, resilience → `tiers/3-scale/skills/`
 
 ### Phase 0b: Task Management Interfaces ✅ COMPLETE
 
@@ -811,12 +811,12 @@ Generic patterns that need abstraction layer for multiple providers (Ebblyn, Lin
 - [x] Add compaction hooks → `tiers/3-scale/hooks/`
 - [x] Verify worktree scripts work standalone
 
-### Phase 0f: Documentation
+### Phase 0f: Documentation ✅ COMPLETE
 
-- [ ] Update tier READMEs with new content
-- [ ] Create skill development guide
-- [ ] Create role customization guide
-- [ ] Update CONTRIBUTING.md
+- [x] Update tier READMEs with new content
+- [x] Create skill development guide → `docs/guides/skill-development.md`
+- [x] Create role customization guide → `docs/guides/role-customization.md`
+- [x] Create CONTRIBUTING.md
 
 ---
 
@@ -826,8 +826,8 @@ Generic patterns that need abstraction layer for multiple providers (Ebblyn, Lin
 |----------|-------|--------|
 | **P0** | ~~debug role~~✅, ~~product-designer role~~✅, ~~refactor workflow~~✅ | ✅ COMPLETE |
 | **P1** | ~~agent-browser skill~~✅, ~~verification strategy in workflows~~✅ | ✅ COMPLETE |
-| **P2** | ~~Core audits (quality/security)~~✅, performance audit, task manager interface | 🔄 In Progress |
-| **P3** | Remaining skills, optional audits, documentation | ⏳ Pending |
+| **P2** | ~~Core audits (quality/security)~~✅, ~~performance audit~~✅, ~~task manager interface~~✅ | ✅ COMPLETE |
+| **P3** | ~~Remaining skills~~✅, ~~optional audits~~✅, ~~documentation~~✅ | ✅ COMPLETE |
 
 ---
 
@@ -885,13 +885,15 @@ The ebblyn/.ai system represents **~9,000+ lines of battle-tested patterns** tha
 4. Depot session persistence (`--resume`) solves dependency installation for agent-browser
 5. Test run strategy: unit/component local, integration/e2e/smoke in CI
 
-**Completed:**
+**Phase 0 Complete:**
+- ✅ Phase 0a: All skills extracted (deploy, reflect, performance-audit, optional audits)
+- ✅ Phase 0b: Task management interface defined + skills index (Agent Skills spec)
 - ✅ Phase 0c: All roles extracted and expanded (debug, product-designer, + 7 existing)
-- ✅ Phase 0d: Workflows enhanced (refactor workflow, TDD enforcement, verification strategy, database isolation, infrastructure impact)
-- ✅ Phase 0a (partial): Core skills extracted (wrap-up, promote, pr-merged, agent-browser) + audit framework with security/quality audits
-- ✅ Phase 0b: Task management interface defined + skills index created (following Agent Skills spec)
-- ✅ Phase 0e: Compaction hooks (pre-compact, post-compact, validate-bash) + worktree scripts verified standalone
+- ✅ Phase 0d: Workflows enhanced (refactor, TDD enforcement, verification strategy, database isolation)
+- ✅ Phase 0e: Compaction hooks + validate-bash + worktree scripts verified
+- ✅ Phase 0f: Documentation (tier READMEs, skill/role guides, CONTRIBUTING.md)
 
-**Remaining:**
-- Phase 0a: deploy skill, reflect skill, performance audit, optional audits (tier 3)
-- Phase 0f: Documentation (tier READMEs, guides)
+**Next Steps:**
+- Phase 1: Create aix-factor repo, copy AIX as dependency
+- Phase 2: Orchestrator core (planning + 1 team)
+- Phase 3+: See aix-factor roadmap

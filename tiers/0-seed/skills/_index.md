@@ -28,14 +28,21 @@ Skills are organized by tier. Higher tiers include all skills from lower tiers.
 | [wrap-up](../../2-grow/skills/wrap-up/SKILL.md) | Session wrap-up check before ending | user |
 | [promote](../../2-grow/skills/promote/SKILL.md) | Create release branch from dev | user |
 | [pr-merged](../../2-grow/skills/pr-merged/SKILL.md) | Post-PR merge summary | user |
+| [deploy](../../2-grow/skills/deploy/SKILL.md) | Deploy to target environment | user |
 | [security-audit](../../2-grow/skills/security-audit/SKILL.md) | Dependency, secrets, OWASP analysis | user, model |
 | [quality-audit](../../2-grow/skills/quality-audit/SKILL.md) | Module size, complexity, coverage | user, model |
+| [performance-audit](../../2-grow/skills/performance-audit/SKILL.md) | Bundle size, API latency, DB queries | user, model |
 
 ### Tier 3 (Scale)
 
 | Skill | Description | Invocation |
 |-------|-------------|------------|
-| *(see tier 3 index)* | | |
+| [reflect](../../3-scale/skills/reflect/SKILL.md) | Session retrospective and improvement proposals | user |
+| [accessibility-audit](../../3-scale/skills/accessibility-audit/SKILL.md) | WCAG AA compliance, keyboard nav, focus | user, model |
+| [privacy-audit](../../3-scale/skills/privacy-audit/SKILL.md) | PII detection, local-first, data retention | user, model |
+| [cognitive-audit](../../3-scale/skills/cognitive-audit/SKILL.md) | Cognitive load, Miller's Law, jargon | user, model |
+| [delight-audit](../../3-scale/skills/delight-audit/SKILL.md) | Brand voice, empty states, micro-interactions | user, model |
+| [resilience-audit](../../3-scale/skills/resilience-audit/SKILL.md) | Offline capability, state recovery | user, model |
 
 ## Directory Structure
 
