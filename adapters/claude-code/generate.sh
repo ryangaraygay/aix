@@ -87,7 +87,8 @@ if [ -d "$AIX_DIR/skills" ] || [ -d "$AIX_DIR/$TIER_PATH/skills" ] 2>/dev/null; 
 fi
 
 # Generate settings.json with hooks configuration
-# New format: {"EventName": [{"matcher": {...}, "hooks": [{"type": "command", "command": "..."}]}]}
+# Format: {"EventName": [{"matcher": "pattern", "hooks": [{"type": "command", "command": "..."}]}]}
+# Matcher is a string (regex pattern), not an object
 SETTINGS_FILE="$CLAUDE_DIR/settings.json"
 
 if [ -d "$HOOKS_DIR" ] && [ "$(ls -A "$HOOKS_DIR" 2>/dev/null)" ]; then
@@ -96,19 +97,19 @@ if [ -d "$HOOKS_DIR" ] && [ "$(ls -A "$HOOKS_DIR" 2>/dev/null)" ]; then
     # Start building JSON
     HOOKS_JSON=""
 
-    # Check for pre-compact hook
+    # Check for pre-compact hook (runs on both manual and auto compaction)
     if [ -f "$HOOKS_DIR/pre-compact.sh" ]; then
-        HOOKS_JSON="$HOOKS_JSON\"PreCompact\": [{\"matcher\": {}, \"hooks\": [{\"type\": \"command\", \"command\": \"$HOOKS_CMD_PATH/pre-compact.sh\"}]}],"
+        HOOKS_JSON="$HOOKS_JSON\"PreCompact\": [{\"hooks\": [{\"type\": \"command\", \"command\": \"$HOOKS_CMD_PATH/pre-compact.sh\"}]}],"
     fi
 
-    # Check for post-compact hook (SessionStart with matcher for compaction)
+    # Check for post-compact hook (SessionStart with matcher "compact")
     if [ -f "$HOOKS_DIR/post-compact.sh" ]; then
-        HOOKS_JSON="$HOOKS_JSON\"SessionStart\": [{\"matcher\": {\"sessionStartReason\": \"compact\"}, \"hooks\": [{\"type\": \"command\", \"command\": \"$HOOKS_CMD_PATH/post-compact.sh\"}]}],"
+        HOOKS_JSON="$HOOKS_JSON\"SessionStart\": [{\"matcher\": \"compact\", \"hooks\": [{\"type\": \"command\", \"command\": \"$HOOKS_CMD_PATH/post-compact.sh\"}]}],"
     fi
 
-    # Check for validate-bash hook (PreToolUse for Bash)
+    # Check for validate-bash hook (PreToolUse with matcher "Bash")
     if [ -f "$HOOKS_DIR/validate-bash.sh" ]; then
-        HOOKS_JSON="$HOOKS_JSON\"PreToolUse\": [{\"matcher\": {\"tools\": [\"Bash\"]}, \"hooks\": [{\"type\": \"command\", \"command\": \"$HOOKS_CMD_PATH/validate-bash.sh\"}]}],"
+        HOOKS_JSON="$HOOKS_JSON\"PreToolUse\": [{\"matcher\": \"Bash\", \"hooks\": [{\"type\": \"command\", \"command\": \"$HOOKS_CMD_PATH/validate-bash.sh\"}]}],"
     fi
 
     # Remove trailing comma and wrap
