@@ -6,6 +6,7 @@ metadata:
   inputs: |
     - upgrade: boolean (optional) - run upgrade flow instead of init
     - tier: number (optional) - target tier for upgrade
+    - adopt: string (optional) - capability name to cherry-pick from higher tiers
   outputs: |
     - .aix/ directory with framework files
     - CLAUDE.md symlink
@@ -29,6 +30,7 @@ Initialize or upgrade the aix framework in your project.
 ```
 /aix-init           # Initialize new project
 /aix-init upgrade   # Upgrade existing project to next tier
+/aix-init adopt     # Cherry-pick individual capabilities from higher tiers
 ```
 
 ## For Init (new project)
@@ -50,6 +52,44 @@ Example:
 ~/Gitea/aix/upgrade.sh 1   # Upgrade to Tier 1
 ~/Gitea/aix/upgrade.sh     # Upgrade to next tier (current + 1)
 ```
+
+## For Adopt (cherry-pick capabilities)
+
+Adopt individual capabilities from higher tiers without full upgrade:
+```bash
+~/Gitea/aix/adopt.sh --list              # List available capabilities
+~/Gitea/aix/adopt.sh <capability-name>   # Adopt a specific capability
+```
+
+Example:
+```bash
+~/Gitea/aix/adopt.sh --list           # See what's available
+~/Gitea/aix/adopt.sh agent-browser    # Adopt browser automation skill
+~/Gitea/aix/adopt.sh commit           # Adopt commit skill
+```
+
+### When to Use Adopt vs Upgrade
+
+| Scenario | Use |
+|----------|-----|
+| Need one specific capability now | `adopt` |
+| Ready for all capabilities of next tier | `upgrade` |
+| Want to incrementally build up | `adopt` multiple times |
+| Following recommended progression | `upgrade` |
+
+### Tracking Adopted Capabilities
+
+Adopted capabilities are tracked in `.aix/tier.yaml`:
+
+```yaml
+tier: 0
+name: seed
+adopted:
+  - agent-browser
+  - commit
+```
+
+This prevents re-adoption and informs the upgrade flow about what's already present.
 
 ## Init Flow
 

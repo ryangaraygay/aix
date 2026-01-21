@@ -1,6 +1,7 @@
 ---
 name: reviewer
 description: Review code quality and spec compliance - find issues, classify severity
+model: opus
 tools: [Read, Bash, Grep, Glob]
 ---
 

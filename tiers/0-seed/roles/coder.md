@@ -1,6 +1,7 @@
 ---
 name: coder
 description: Implement code according to spec - write code, tests, and documentation
+model: sonnet
 tools: [Read, Write, Edit, Bash, Grep, Glob]
 ---
 

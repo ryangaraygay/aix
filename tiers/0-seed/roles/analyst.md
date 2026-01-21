@@ -1,6 +1,7 @@
 ---
 name: analyst
 description: Plan and architect solutions - create specs with clear acceptance criteria and structured task breakdowns
+model: opus
 tools: [Read, Bash, Grep, Glob]
 ---
 
