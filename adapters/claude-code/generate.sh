@@ -86,45 +86,15 @@ if [ -d "$AIX_DIR/skills" ] || [ -d "$AIX_DIR/$TIER_PATH/skills" ] 2>/dev/null; 
     echo "✓ Created .claude/skills symlink -> $SKILLS_PATH"
 fi
 
-# Generate settings.json with hooks configuration
-# Format matches ebblyn-ecosystem (known working)
+# Generate settings.json - copy ebblyn format exactly, just change paths
 SETTINGS_FILE="$CLAUDE_DIR/settings.json"
 
-if [ -d "$HOOKS_DIR" ] && [ "$(ls -A "$HOOKS_DIR" 2>/dev/null)" ]; then
+if [ -d "$HOOKS_DIR" ] && [ -f "$HOOKS_DIR/pre-compact.sh" ]; then
     echo "Generating .claude/settings.json with hooks..."
-
-    # Build hooks JSON matching ebblyn format exactly
+    # Exact copy of ebblyn format, paths updated
     cat > "$SETTINGS_FILE" << EOF
 {
   "hooks": {
-EOF
-
-    FIRST_HOOK=true
-
-    # Check for validate-bash hook (PreToolUse)
-    if [ -f "$HOOKS_DIR/validate-bash.sh" ]; then
-        [ "$FIRST_HOOK" = false ] && echo "," >> "$SETTINGS_FILE"
-        FIRST_HOOK=false
-        cat >> "$SETTINGS_FILE" << EOF
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$HOOKS_CMD_PATH/validate-bash.sh"
-          }
-        ]
-      }
-    ]
-EOF
-    fi
-
-    # Check for pre-compact hook (needs both auto and manual matchers)
-    if [ -f "$HOOKS_DIR/pre-compact.sh" ]; then
-        [ "$FIRST_HOOK" = false ] && echo "," >> "$SETTINGS_FILE"
-        FIRST_HOOK=false
-        cat >> "$SETTINGS_FILE" << EOF
     "PreCompact": [
       {
         "matcher": "auto",
@@ -144,15 +114,7 @@ EOF
           }
         ]
       }
-    ]
-EOF
-    fi
-
-    # Check for post-compact hook (SessionStart with compact matcher)
-    if [ -f "$HOOKS_DIR/post-compact.sh" ]; then
-        [ "$FIRST_HOOK" = false ] && echo "," >> "$SETTINGS_FILE"
-        FIRST_HOOK=false
-        cat >> "$SETTINGS_FILE" << EOF
+    ],
     "SessionStart": [
       {
         "matcher": "compact",
@@ -164,24 +126,14 @@ EOF
         ]
       }
     ]
-EOF
-    fi
-
-    # Close the JSON
-    cat >> "$SETTINGS_FILE" << EOF
   }
 }
 EOF
     echo "✓ Created .claude/settings.json with hooks"
 else
-    # No hooks, create minimal settings
     if [ ! -f "$SETTINGS_FILE" ]; then
-        cat > "$SETTINGS_FILE" << EOF
-{
-  "hooks": {}
-}
-EOF
-        echo "✓ Created .claude/settings.json (no hooks)"
+        echo '{}' > "$SETTINGS_FILE"
+        echo "✓ Created .claude/settings.json (empty)"
     fi
 fi
 
