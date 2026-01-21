@@ -184,6 +184,44 @@ Create: `.aix/plans/{feature}/plan.md`
 - **Clean exit**: No critical, high, or medium issues
 - **Escalate**: Max iterations reached, no progress, or timeout
 
+### Low-Severity Issue Disposition
+
+**Default: Fix now.** Only defer when the cost of fixing exceeds the cost of tracking.
+
+#### Why Fix Now is the Default
+
+The overhead of deferral is often underestimated:
+- Time to discuss whether to defer
+- Time to create and describe the debt card
+- Noise in the backlog
+- Context lost when someone picks it up later
+- Time to re-understand the issue
+- Risk it never gets done
+
+For a 5-minute fix, this overhead easily exceeds the fix itself.
+
+#### When to Defer Instead
+
+Only defer when:
+- The fix touches unrelated code (scope creep risk)
+- The fix requires investigation beyond the current context
+- The fix has non-trivial risk of regression
+- The fix requires coordination with other work
+
+#### Decision Heuristic
+
+| Fix Effort | Risk | Action |
+|------------|------|--------|
+| < 10 min | Low | Fix now |
+| < 10 min | High | Defer (explain risk) |
+| > 10 min | Low | Ask user |
+| > 10 min | High | Defer |
+
+If in doubt: fix it. A fixed issue never needs to be discussed again.
+
+> **For aix-factor (autonomous)**: Default to "fix now" for < 10 min fixes.
+> Defer > 10 min fixes (no user to ask).
+
 ### Escalation Handling
 
 ```
