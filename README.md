@@ -25,9 +25,11 @@ The **constitution + workflow + role** trinity with **approval gates** and **pro
 ## What Makes aix Special
 
 - Agents/roles, skills, and hooks are first-class; there are richer collections elsewhere, and aix is designed to integrate them, not replace them.
+- Compaction-aware by default: hooks persist/restore context for Claude Code sessions.
 - Constitution + workflows are familiar; the difference is the combination with roles/skills/hooks and how they are enforced together.
 - Progressive enforcement: start minimal, grow as the project matures, or simplify later.
 - Safe evolution: adopt improvements from newer AIX versions without overwriting local customizations.
+- Primary support is Claude Code; other tool integrations (symlinks for constitutions/skills) are possible but not the current focus.
 
 ---
 
