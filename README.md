@@ -22,6 +22,15 @@ The **constitution + workflow + role** trinity with **approval gates** and **pro
 
 ---
 
+## What Makes aix Special
+
+- Agents/roles, skills, and hooks are first-class; there are richer collections elsewhere, and aix is designed to integrate them, not replace them.
+- Constitution + workflows are familiar; the difference is the combination with roles/skills/hooks and how they are enforced together.
+- Progressive enforcement: start minimal, grow as the project matures, or simplify later.
+- Safe evolution: adopt improvements from newer AIX versions without overwriting local customizations.
+
+---
+
 ## Three Horizons
 
 ```
@@ -151,12 +160,6 @@ From [Human+AI Value Creation](https://ryangaraygay.com/describe-design-decide-d
 > The bottleneck in software creation is shifting from "coding speed" to the human ability to **Describe and Design** high-value systems.
 
 aix embodies this: you focus on the "why" and "what", AI handles the "how".
-
----
-
-## Status
-
-**Early development.** Extracted from [Ebblyn](https://github.com/ryangaraygay/ebblyn), a production system built in 30 days using this methodology.
 
 ---
 
