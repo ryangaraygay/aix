@@ -7,11 +7,16 @@
 #
 # Claude Code Hook Events:
 #   - Trigger: PreToolUse (tool: Bash)
-#   - Output: JSON with decision (allow/block) and optional reason
+#   - Output: JSON with hookSpecificOutput containing permissionDecision
 #
 # Exit codes:
-#   0 = allow (proceed with tool)
-#   2 = block (deny with message to Claude)
+#   0 = success (JSON response contains the decision)
+#   non-zero = hook error (stderr shown to Claude, tool proceeds)
+#
+# Permission decisions (in hookSpecificOutput.permissionDecision):
+#   "allow" = bypass permission system, proceed with tool
+#   "deny"  = block tool execution with reason
+#   "ask"   = prompt user for confirmation
 #
 
 set -euo pipefail
@@ -20,16 +25,28 @@ set -euo pipefail
 INPUT=$(cat)
 COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // ""' 2>/dev/null || echo "")
 
-# Output JSON response
+# Output JSON response in Claude Code's expected format
 respond() {
     local decision="$1"
     local reason="${2:-}"
 
     if [ -n "$reason" ]; then
         jq -n --arg d "$decision" --arg r "$reason" \
-            '{"decision": $d, "reason": $r}'
+            '{
+                "hookSpecificOutput": {
+                    "hookEventName": "PreToolUse",
+                    "permissionDecision": $d,
+                    "permissionDecisionReason": $r
+                }
+            }'
     else
-        jq -n --arg d "$decision" '{"decision": $d}'
+        jq -n --arg d "$decision" \
+            '{
+                "hookSpecificOutput": {
+                    "hookEventName": "PreToolUse",
+                    "permissionDecision": $d
+                }
+            }'
     fi
 }
 
@@ -39,20 +56,20 @@ respond() {
 
 # Prisma migrate reset (drops and recreates database)
 if echo "$COMMAND" | grep -qiE 'prisma\s+migrate\s+reset'; then
-    respond "block" "BLOCKED: prisma migrate reset detected. This drops the entire database. Get explicit user approval first."
-    exit 2
+    respond "deny" "BLOCKED: prisma migrate reset detected. This drops the entire database. Get explicit user approval first."
+    exit 0
 fi
 
 # Prisma db push with destructive flags
 if echo "$COMMAND" | grep -qiE 'prisma\s+db\s+push' && echo "$COMMAND" | grep -qiE '(--force-reset|--accept-data-loss)'; then
-    respond "block" "BLOCKED: Destructive prisma db push flag detected. Get explicit user approval first."
-    exit 2
+    respond "deny" "BLOCKED: Destructive prisma db push flag detected. Get explicit user approval first."
+    exit 0
 fi
 
 # Raw SQL destructive commands (only in SQL execution contexts)
 if echo "$COMMAND" | grep -qiE '(psql|mysql|prisma\s+db\s+execute)' && echo "$COMMAND" | grep -qiE '(DROP\s+(DATABASE|TABLE|SCHEMA)|TRUNCATE\s+TABLE)'; then
-    respond "block" "BLOCKED: Destructive SQL command detected. Get explicit user approval first."
-    exit 2
+    respond "deny" "BLOCKED: Destructive SQL command detected. Get explicit user approval first."
+    exit 0
 fi
 
 # =============================================================================
