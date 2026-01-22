@@ -121,6 +121,7 @@ When in doubt, ask the user rather than guessing.
 | Config | `.aix/config.yaml` |
 | Product spec | `docs/product.md` |
 | Tech stack | `docs/tech-stack.md` |
+| Design system | `docs/design.md` |
 | State (gitignored) | `.aix/state/` |
 
 ---

@@ -65,12 +65,12 @@ EOF
     {
         printf '\n%s\n' "$SNAPSHOT_START"
         printf '## Compaction Snapshot\n'
-        printf '- Timestamp: %s\n' "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-        printf '- Trigger: %s\n' "$TRIGGER"
-        printf '- Branch: %s\n' "$CURRENT_BRANCH"
-        printf '- Worktree: %s\n' "$WORKTREE_NAME"
-        printf '- Worktree Path: %s\n' "$WORKTREE_RELATIVE"
-        printf '- Uncommitted Files: %s\n\n' "$UNCOMMITTED_COUNT"
+        printf -- '- Timestamp: %s\n' "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+        printf -- '- Trigger: %s\n' "$TRIGGER"
+        printf -- '- Branch: %s\n' "$CURRENT_BRANCH"
+        printf -- '- Worktree: %s\n' "$WORKTREE_NAME"
+        printf -- '- Worktree Path: %s\n' "$WORKTREE_RELATIVE"
+        printf -- '- Uncommitted Files: %s\n\n' "$UNCOMMITTED_COUNT"
         printf '### Uncommitted Changes\n```\n%s\n```\n\n' "$GIT_STATUS"
         printf '### Recent Commits\n```\n%s\n```\n\n' "$RECENT_COMMITS"
         printf '### Existing PR\n```json\n%s\n```\n' "$EXISTING_PR"
