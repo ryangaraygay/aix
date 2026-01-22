@@ -9,6 +9,14 @@ AIX_FRAMEWORK="${AIX_FRAMEWORK:-$HOME/Gitea/aix}"
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 AIX_DIR="$REPO_ROOT/.aix"
 TIER_FILE="$AIX_DIR/tier.yaml"
+MANIFEST_TOOL="$AIX_FRAMEWORK/scripts/aix-manifest.py"
+MANIFEST_FILE="$AIX_DIR/manifest.json"
+
+if git -C "$AIX_FRAMEWORK" rev-parse --git-dir > /dev/null 2>&1; then
+    AIX_VERSION="$(git -C "$AIX_FRAMEWORK" rev-parse --short HEAD)"
+else
+    AIX_VERSION="unknown"
+fi
 
 # Colors
 RED='\033[0;31m'
@@ -30,47 +38,132 @@ else
     CURRENT_TIER=0
 fi
 
-# Capability registry - maps name to tier/type/path
-# Format: "name:tier:type:subpath"
-declare -a CAPABILITIES=(
-    # Tier 1 - Sprout
-    "test:1:skill:skills/test"
-    "commit:1:skill:skills/commit"
-    "tester:1:role:roles/tester.md"
-    "docs:1:role:roles/docs.md"
-    "quick-fix:1:workflow:workflows/quick-fix.md"
-    "pre-commit:1:hook:hooks/pre-commit"
+# Capability registry (tab-delimited)
+# Columns: name  tier  type  subpath  notes
+REGISTRY_FILE="$AIX_FRAMEWORK/registry.tsv"
+declare -a CAPABILITIES=()
 
-    # Tier 2 - Grow
-    "agent-browser:2:skill:skills/agent-browser"
-    "security-audit:2:skill:skills/security-audit"
-    "quality-audit:2:skill:skills/quality-audit"
-    "performance-audit:2:skill:skills/performance-audit"
-    "wrap-up:2:skill:skills/wrap-up"
-    "promote:2:skill:skills/promote"
-    "pr-merged:2:skill:skills/pr-merged"
-    "deploy:2:skill:skills/deploy"
-    "triage:2:role:roles/triage.md"
-    "orchestrator:2:role:roles/orchestrator.md"
-    "feature:2:workflow:workflows/feature.md"
-    "refactor:2:workflow:workflows/refactor.md"
-    "ci-node:2:ci:ci/ci-node.yml"
-    "ci-python:2:ci:ci/ci-python.yml"
-    "ci-go:2:ci:ci/ci-go.yml"
+load_capabilities() {
+    CAPABILITIES=()
+    if [ -f "$REGISTRY_FILE" ]; then
+        while IFS=$'	' read -r cap_name cap_tier cap_type cap_subpath cap_notes; do
+            if [ -z "$cap_name" ] || [[ "$cap_name" == \#* ]] || [ "$cap_name" = "name" ]; then
+                continue
+            fi
+            CAPABILITIES+=("$cap_name:$cap_tier:$cap_type:$cap_subpath")
+        done < "$REGISTRY_FILE"
+        return 0
+    fi
 
-    # Tier 3 - Scale
-    "reflect:3:skill:skills/reflect"
-    "accessibility-audit:3:skill:skills/accessibility-audit"
-    "privacy-audit:3:skill:skills/privacy-audit"
-    "cognitive-audit:3:skill:skills/cognitive-audit"
-    "delight-audit:3:skill:skills/delight-audit"
-    "resilience-audit:3:skill:skills/resilience-audit"
-    "debug:3:role:roles/debug.md"
-    "product-designer:3:role:roles/product-designer.md"
-    "validate-bash:3:hook:hooks/validate-bash.sh"
-    "worktree-setup:3:script:scripts/worktree-setup.sh"
-    "worktree-cleanup:3:script:scripts/worktree-cleanup.sh"
-)
+    # Fallback registry (kept for compatibility)
+    CAPABILITIES=(
+        # Tier 1 - Sprout
+        "test:1:skill:skills/test"
+        "commit:1:skill:skills/commit"
+        "tester:1:role:roles/tester.md"
+        "docs:1:role:roles/docs.md"
+        "architecture-guardrails:1:docs:docs/architecture"
+        "quick-fix:1:workflow:workflows/quick-fix.md"
+        "pre-commit:1:hook:hooks/pre-commit"
+
+        # Tier 2 - Grow
+        "agent-browser:2:skill:skills/agent-browser"
+        "security-audit:2:skill:skills/security-audit"
+        "quality-audit:2:skill:skills/quality-audit"
+        "performance-audit:2:skill:skills/performance-audit"
+        "wrap-up:2:skill:skills/wrap-up"
+        "promote:2:skill:skills/promote"
+        "pr-merged:2:skill:skills/pr-merged"
+        "deploy:2:skill:skills/deploy"
+        "triage:2:role:roles/triage.md"
+        "orchestrator:2:role:roles/orchestrator.md"
+        "feature:2:workflow:workflows/feature.md"
+        "refactor:2:workflow:workflows/refactor.md"
+        "ci-node:2:ci:ci/ci-node.yml"
+        "ci-python:2:ci:ci-python.yml"
+        "ci-go:2:ci:ci-go.yml"
+
+        # Tier 3 - Scale
+        "reflect:3:skill:skills/reflect"
+        "accessibility-audit:3:skill:skills/accessibility-audit"
+        "privacy-audit:3:skill:skills/privacy-audit"
+        "cognitive-audit:3:skill:skills/cognitive-audit"
+        "delight-audit:3:skill:skills/delight-audit"
+        "resilience-audit:3:skill:skills/resilience-audit"
+        "debug:3:role:roles/debug.md"
+        "product-designer:3:role:roles/product-designer.md"
+        "validate-bash:3:hook:hooks/validate-bash.sh"
+        "worktree-setup:3:script:scripts/worktree-setup.sh"
+        "worktree-cleanup:3:script:scripts/worktree-cleanup.sh"
+    )
+}
+
+copy_tree_if_missing() {
+    local src="$1"
+    local dest="$2"
+
+    if [ -f "$src" ]; then
+        if [ ! -f "$dest" ]; then
+            mkdir -p "$(dirname "$dest")"
+            cp "$src" "$dest"
+        fi
+        return 0
+    fi
+
+    if [ -d "$src" ]; then
+        find "$src" -type f | while read -r file; do
+            local rel="${file#$src/}"
+            local target="$dest/$rel"
+            if [ ! -f "$target" ]; then
+                mkdir -p "$(dirname "$target")"
+                cp "$file" "$target"
+            fi
+        done
+        return 0
+    fi
+
+    return 1
+}
+
+init_manifest() {
+    if [ -f "$MANIFEST_TOOL" ]; then
+        python3 "$MANIFEST_TOOL" init \
+            --manifest "$MANIFEST_FILE" \
+            --aix-version "$AIX_VERSION"
+    fi
+}
+
+record_manifest_file() {
+    local source_path="$1"
+    local dest_path="$2"
+    local capability="$3"
+    if [ -f "$MANIFEST_TOOL" ]; then
+        python3 "$MANIFEST_TOOL" record \
+            --manifest "$MANIFEST_FILE" \
+            --repo-root "$REPO_ROOT" \
+            --framework-root "$AIX_FRAMEWORK" \
+            --source "$source_path" \
+            --dest "$dest_path" \
+            --capability "$capability" \
+            --aix-version "$AIX_VERSION"
+    fi
+}
+
+record_manifest_dir() {
+    local source_root="$1"
+    local dest_root="$2"
+    local capability="$3"
+    if [ -f "$MANIFEST_TOOL" ]; then
+        python3 "$MANIFEST_TOOL" record-dir \
+            --manifest "$MANIFEST_FILE" \
+            --repo-root "$REPO_ROOT" \
+            --framework-root "$AIX_FRAMEWORK" \
+            --source-root "$source_root" \
+            --dest-root "$dest_root" \
+            --capability "$capability" \
+            --aix-version "$AIX_VERSION"
+    fi
+}
 
 # List available capabilities
 list_capabilities() {
@@ -138,6 +231,9 @@ is_adopted() {
                     ;;
                 script)
                     [ -f "$AIX_DIR/scripts/$(basename "$cap_subpath")" ] && return 0
+                    ;;
+                docs)
+                    [ -e "$REPO_ROOT/$cap_subpath" ] && return 0
                     ;;
             esac
         fi
@@ -213,6 +309,7 @@ adopt_capability() {
             echo "  Copying skill to $dest_dir..."
             mkdir -p "$dest_dir"
             cp -r "$source_path/"* "$dest_dir/"
+            record_manifest_dir "$source_path" "$dest_dir" "$name"
             echo -e "  ${GREEN}✓ Skill copied${NC}"
 
             # Symlink is already set up by bootstrap (.claude/skills -> .aix/skills)
@@ -224,6 +321,7 @@ adopt_capability() {
             local dest_file="$AIX_DIR/roles/$role_file"
             echo "  Copying role to $dest_file..."
             cp "$source_path" "$dest_file"
+            record_manifest_file "$source_path" "$dest_file" "$name"
             echo -e "  ${GREEN}✓ Role copied${NC}"
 
             # Symlink is already set up by bootstrap (.claude/agents -> .aix/roles)
@@ -235,6 +333,7 @@ adopt_capability() {
             local dest_file="$AIX_DIR/workflows/$workflow_file"
             echo "  Copying workflow to $dest_file..."
             cp "$source_path" "$dest_file"
+            record_manifest_file "$source_path" "$dest_file" "$name"
             echo -e "  ${GREEN}✓ Workflow copied${NC}"
             ;;
 
@@ -245,6 +344,7 @@ adopt_capability() {
             mkdir -p "$AIX_DIR/hooks"
             cp "$source_path" "$dest_file"
             chmod +x "$dest_file"
+            record_manifest_file "$source_path" "$dest_file" "$name"
             echo -e "  ${GREEN}✓ Hook copied${NC}"
             echo -e "  ${YELLOW}Note: Ensure .claude/settings.json references hooks${NC}"
             ;;
@@ -255,8 +355,18 @@ adopt_capability() {
             echo "  Copying CI template to $dest_file..."
             mkdir -p "$AIX_DIR/ci"
             cp "$source_path" "$dest_file"
+            record_manifest_file "$source_path" "$dest_file" "$name"
             echo -e "  ${GREEN}✓ CI template copied${NC}"
             echo -e "  ${YELLOW}Note: Copy to .github/workflows/ to activate${NC}"
+            ;;
+
+        docs)
+            local rel_path="${cap_subpath#docs/}"
+            local dest_dir="$REPO_ROOT/docs/$rel_path"
+            echo "  Copying docs to $dest_dir..."
+            copy_tree_if_missing "$source_path" "$dest_dir"
+            record_manifest_dir "$source_path" "$dest_dir" "$name"
+            echo -e "  ${GREEN}✓ Docs copied${NC}"
             ;;
 
         script)
@@ -266,6 +376,7 @@ adopt_capability() {
             mkdir -p "$AIX_DIR/scripts"
             cp "$source_path" "$dest_file"
             chmod +x "$dest_file"
+            record_manifest_file "$source_path" "$dest_file" "$name"
             echo -e "  ${GREEN}✓ Script copied${NC}"
             ;;
     esac
@@ -303,6 +414,8 @@ adopt_capability() {
 }
 
 # Main
+init_manifest
+load_capabilities
 case "${1:-}" in
     --list|-l|list)
         list_capabilities

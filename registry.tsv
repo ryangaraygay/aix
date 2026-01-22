@@ -1,0 +1,34 @@
+# name	tier	type	subpath	notes
+test	1	skill	skills/test	Run tests
+commit	1	skill	skills/commit	Commit helper
+tester	1	role	roles/tester.md	Tester role
+docs	1	role	roles/docs.md	Docs role
+architecture-guardrails	1	docs	docs/architecture	Architecture guardrail templates
+quick-fix	1	workflow	workflows/quick-fix.md	Quick fix workflow
+pre-commit	1	hook	hooks/pre-commit	Pre-commit hook
+agent-browser	2	skill	skills/agent-browser	Browser automation skill
+security-audit	2	skill	skills/security-audit	Security audit skill
+quality-audit	2	skill	skills/quality-audit	Quality audit skill
+performance-audit	2	skill	skills/performance-audit	Performance audit skill
+wrap-up	2	skill	skills/wrap-up	Wrap-up skill
+promote	2	skill	skills/promote	Promote skill
+pr-merged	2	skill	skills/pr-merged	Post-merge skill
+deploy	2	skill	skills/deploy	Deploy skill
+triage	2	role	roles/triage.md	Triage role
+orchestrator	2	role	roles/orchestrator.md	Orchestrator role
+feature	2	workflow	workflows/feature.md	Feature workflow
+refactor	2	workflow	workflows/refactor.md	Refactor workflow
+ci-node	2	ci	ci/ci-node.yml	Node CI template
+ci-python	2	ci	ci/ci-python.yml	Python CI template
+ci-go	2	ci	ci/ci-go.yml	Go CI template
+reflect	3	skill	skills/reflect	Reflection skill
+accessibility-audit	3	skill	skills/accessibility-audit	Accessibility audit
+privacy-audit	3	skill	skills/privacy-audit	Privacy audit
+cognitive-audit	3	skill	skills/cognitive-audit	Cognitive audit
+delight-audit	3	skill	skills/delight-audit	Delight audit
+resilience-audit	3	skill	skills/resilience-audit	Resilience audit
+debug	3	role	roles/debug.md	Debug role
+product-designer	3	role	roles/product-designer.md	Product designer role
+validate-bash	3	hook	hooks/validate-bash.sh	Validate bash hook
+worktree-setup	3	script	scripts/worktree-setup.sh	Worktree setup script
+worktree-cleanup	3	script	scripts/worktree-cleanup.sh	Worktree cleanup script

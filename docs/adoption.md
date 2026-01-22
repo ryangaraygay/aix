@@ -1,6 +1,6 @@
-# AIX Adoption Guide
+# AIX Adoption and Evolution Guide
 
-How to add AIX to your project.
+How to add AIX to your project and keep it evolving without losing local adaptations.
 
 ---
 
@@ -16,7 +16,45 @@ git submodule add git@github.com:ebblyn/aix.git .aix
 
 ---
 
-## Adoption Paths
+## Mental Model
+
+- **Capabilities are the atomic unit** (roles, workflows, skills, hooks, docs).
+- **Tiers are curated bundles** of capabilities, not separate systems.
+- **AIX is file-based** (no runtime dependency). Adoption is copying files or using a submodule.
+- **Evolution should be additive and safe**, never blind overwrite.
+
+## Lifecycle Scenarios
+
+1. **First-time adoption** - initialize AIX in a repo.
+2. **Progressive adoption** - add capabilities as the project matures.
+3. **Ongoing improvements** - pull new AIX updates while keeping local changes.
+4. **Optional downgrade** - remove capabilities to simplify.
+
+## Core Artifacts
+
+These are created by bootstrap/upgrade/adopt and enable safe evolution.
+
+| Artifact | Location | Purpose |
+|----------|----------|---------|
+| Capability registry | AIX repo | Defines capabilities, files, tier membership, merge policy |
+| Manifest/lockfile | `.aix/manifest.json` | Tracks installed files and AIX version |
+| Template snapshots | `.aix/snapshots/` | Enables three-way merges on updates |
+
+## Tools and Responsibilities
+
+**Deterministic scripts:**
+- `bootstrap.sh` - initial install (Scenario 1)
+- `upgrade.sh` - tier upgrades (Scenario 2)
+- `adopt.sh` - add a capability (Scenario 2)
+- `aix-status` - report version and drift
+- `aix-prune` (planned) - remove capabilities safely (Scenario 4)
+
+**AI skills (discernment required):**
+- `aix-sync` - propose merges from new AIX updates (Scenario 3)
+
+---
+
+## Adoption Paths (Scenario 1)
 
 ### 1. Bootstrap (Recommended)
 
@@ -63,13 +101,16 @@ my-project/
     └── design.md
 ```
 
-**Upgrading:**
+**Progressive adoption:**
 ```bash
 # Via skill (inside Claude Code)
 /aix-init upgrade
 
 # Or via script
 ~/tools/aix/upgrade.sh 2   # upgrade to Tier 2
+
+# Adopt a single capability
+~/tools/aix/adopt.sh <capability>
 ```
 
 **Pros:**
@@ -153,6 +194,33 @@ cd ..
 | Contributing to AIX itself | **Submodule** |
 | Experimenting with AIX | **Bootstrap** |
 | Running AIX in CI/CD | **Bootstrap** (simpler) |
+
+---
+
+## Progressive Adoption (Scenario 2)
+
+Use upgrades to add tier bundles and `adopt` to cherry-pick specific capabilities. These operations are additive and do not overwrite existing files.
+
+---
+
+## Ongoing Improvements (Scenario 3)
+
+Goal: apply new AIX improvements without losing local adaptations.
+
+Current approach:
+- `aix-status` reports available updates and drift.
+- `aix-sync` proposes a merge using template snapshots (three-way merge).
+- Changes are reviewed before applying.
+
+---
+
+## Downgrade / Simplify (Scenario 4, Optional)
+
+Goal: remove capabilities safely when a project wants less structure.
+
+Planned approach:
+- `aix-prune` removes capabilities recorded in the manifest.
+- Only deletes files that match the installed snapshot or are explicitly AIX-owned.
 
 ---
 
