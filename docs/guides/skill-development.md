@@ -42,7 +42,7 @@ compatibility: |              # System requirements
   Requires git and gh CLI.
   Optional: docker for containerized runs.
 mode: aix-local-only |        # AIX-specific mode constraint
-      aix-factor-only |       # (see Mode Constraints below)
+      aix-autonomous-only |   # (see Mode Constraints below)
       aix-local-preferred
 metadata:                     # Custom properties
   invocation: user | model | both
@@ -140,7 +140,7 @@ Some skills only make sense in certain contexts:
 | Mode | When to Use |
 |------|-------------|
 | `aix-local-only` | Interactive features (wrap-up, dev-start) |
-| `aix-factor-only` | Cloud-only features |
+| `aix-autonomous-only` | Autonomous/non-interactive runs (CI, remote agents) |
 | `aix-local-preferred` | Works in both, best locally (promote, deploy) |
 | *(none)* | Works equally well everywhere |
 

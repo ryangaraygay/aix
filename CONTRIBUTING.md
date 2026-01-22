@@ -86,7 +86,6 @@ aix/
 │   └── task-manager/         # Task management interface
 ├── docs/                     # Documentation
 │   ├── guides/               # How-to guides
-│   └── aix-vs-aix-factor.md  # Strategy document
 ├── bootstrap.sh              # Initial setup script
 └── upgrade.sh                # Tier upgrade script
 ```

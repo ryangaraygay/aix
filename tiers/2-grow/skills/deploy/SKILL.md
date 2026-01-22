@@ -20,7 +20,7 @@ metadata:
 Deploy application to a target environment with safety checks.
 
 > **Mode**: AIX-local preferred. Interactive confirmation is most useful for humans.
-> Can work in aix-factor with appropriate flags for automated deployments.
+> Can work in automated pipelines with appropriate flags for non-interactive deployments.
 
 ## Purpose
 

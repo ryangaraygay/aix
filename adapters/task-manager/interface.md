@@ -1,7 +1,7 @@
 # Task Manager Interface
 
 > **Status**: Specification only. No implementations exist in AIX yet.
-> This interface defines the contract; implementations live in your project or aix-factor.
+> This interface defines the contract; implementations live in your project or an external service.
 
 AIX defines a provider-agnostic interface for task management. Implementations can target different backends (GitHub Issues, Linear, Jira, custom boards, etc.).
 

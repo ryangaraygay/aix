@@ -67,7 +67,7 @@ description: What this skill  # Required, 1-1024 characters
 compatibility: Environment    # Optional, system requirements
                requirements
 mode: aix-local-only |        # Optional, AIX-specific mode constraint
-      aix-factor-only |
+      aix-autonomous-only |
       aix-local-preferred
 metadata:                     # Optional, custom properties
   invocation: user | model | both
@@ -94,7 +94,7 @@ Some skills only make sense in certain contexts:
 | Mode | Description |
 |------|-------------|
 | `aix-local-only` | Only useful in interactive local sessions (e.g., wrap-up) |
-| `aix-factor-only` | Only useful in autonomous aix-factor runs |
+| `aix-autonomous-only` | Only useful in autonomous (non-interactive) runs |
 | `aix-local-preferred` | Works in both, but most useful locally |
 | *(none)* | Works equally well in both contexts |
 
@@ -140,7 +140,7 @@ Execute the commands in the Execution section, substituting inputs as needed.
 
 Task management skills (get-task, create-task, etc.) are **provider-specific**.
 
-AIX defines the interface; implementations live in your project or aix-factor.
+AIX defines the interface; implementations live in your project or an external service.
 
 See: [Task Manager Interface](../../../adapters/task-manager/interface.md)
 

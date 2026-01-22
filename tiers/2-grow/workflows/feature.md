@@ -219,7 +219,7 @@ Only defer when:
 
 If in doubt: fix it. A fixed issue never needs to be discussed again.
 
-> **For aix-factor (autonomous)**: Default to "fix now" for < 10 min fixes.
+> **For autonomous/non-interactive runs**: Default to "fix now" for < 10 min fixes.
 > Defer > 10 min fixes (no user to ask).
 
 ### Verification Strategy
@@ -252,7 +252,7 @@ Test run strategy varies by test type:
 3. Test migration on isolated DB
 4. Document migration path for production
 
-> **For aix-factor**: Database isolation is STRICT. Always use isolated/seeded databases.
+> **For autonomous/non-interactive runs**: Database isolation is STRICT. Always use isolated/seeded databases.
 
 ### Infrastructure Impact
 

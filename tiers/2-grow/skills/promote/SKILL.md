@@ -19,7 +19,7 @@ metadata:
 Create a release branch from dev and open a PR to main (GitFlow release process).
 
 > **Mode**: AIX-local preferred. Interactive version selection is most useful for humans.
-> Can work in aix-factor with `--yes` flag for automated releases.
+> Can work in automated pipelines with `--yes` for non-interactive releases.
 
 ## Purpose
 

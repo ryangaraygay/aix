@@ -18,7 +18,7 @@ npm install -g agent-browser
 npx playwright install chromium
 ```
 
-> **For Depot/aix-factor**: First run installs dependencies.
+> **For remote/headless runners**: First run installs dependencies.
 > Use `--resume` flag on subsequent runs to preserve installation.
 
 ## Quick Start

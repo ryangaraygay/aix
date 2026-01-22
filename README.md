@@ -33,16 +33,6 @@ The **constitution + workflow + role** trinity with **approval gates** and **pro
 
 ---
 
-## Three Horizons
-
-```
-HORIZON 1 (Now)     → Framework for Claude Code (terminal, human-in-the-loop)
-HORIZON 2 (Next)    → Agent SDK automation (headless, webhooks)
-HORIZON 3 (Future)  → SaaS (upload docs → deployed app)
-```
-
----
-
 ## Progressive Tiers
 
 aix grows with your project:

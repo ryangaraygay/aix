@@ -128,7 +128,7 @@ my-project/
 ### 2. Submodule
 
 **For:**
-- Repos that BUILD or EXTEND AIX (e.g., aix-factor)
+- Repos that build or extend AIX tooling
 - Contributors to AIX itself
 - Projects that need bleeding-edge AIX
 
@@ -190,7 +190,7 @@ cd ..
 | If you are... | Use |
 |---------------|-----|
 | Adding AIX to a new/existing project | **Bootstrap** |
-| Building tools that use AIX (like aix-factor) | **Submodule** |
+| Building tools that use AIX | **Submodule** |
 | Contributing to AIX itself | **Submodule** |
 | Experimenting with AIX | **Bootstrap** |
 | Running AIX in CI/CD | **Bootstrap** (simpler) |
