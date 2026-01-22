@@ -39,6 +39,7 @@ Essential for any project. Run these regularly.
 |-------|---------|------|
 | **security-audit** | Dependencies, secrets, OWASP Top 10 | 2-grow |
 | **quality-audit** | Module sizes, complexity, test coverage | 2-grow |
+| **performance-audit** | Bundle sizes, API latency, DB efficiency | 2-grow |
 
 ### Specialized Audits (Tier 3)
 
@@ -46,7 +47,6 @@ Domain-specific audits for mature projects.
 
 | Audit | Purpose | Tier |
 |-------|---------|------|
-| **performance-audit** | Bundle sizes, API latency, DB efficiency | 3-scale |
 | **accessibility-audit** | WCAG AA compliance, keyboard nav, focus | 3-scale |
 | **resilience-audit** | Offline support, state recovery, error boundaries | 3-scale |
 | **privacy-audit** | PII detection, data retention, local-first | 3-scale |
@@ -63,7 +63,7 @@ name: {domain}-audit
 description: {One-line description of what this audit checks}
 compatibility: {Required tools, e.g., "Requires pnpm, eslint"}
 metadata:
-  invocation: both  # user | proactive | both
+  invocation: both  # user | model | both
   inputs: |
     - scope: string (optional, all|backend|frontend, default: all)
     - quick: boolean (optional, skip heavy checks, default: false)

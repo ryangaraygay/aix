@@ -1,6 +1,6 @@
 #!/bin/bash
 # Generate Claude Code files from aix framework
-# Usage: ./aix/adapters/claude-code/generate.sh [tier]
+# Usage: ./adapters/claude-code/generate.sh [tier]
 #
 # Supports two patterns:
 # 1. Bootstrapped repos: files copied flat to .aix/
@@ -86,12 +86,12 @@ if [ -d "$AIX_DIR/skills" ] || [ -d "$AIX_DIR/$TIER_PATH/skills" ] 2>/dev/null; 
     echo "✓ Created .claude/skills symlink -> $SKILLS_PATH"
 fi
 
-# Generate settings.json - copy ebblyn format exactly, just change paths
+# Generate settings.json using Claude Code hooks format
 SETTINGS_FILE="$CLAUDE_DIR/settings.json"
 
 if [ -d "$HOOKS_DIR" ] && [ -f "$HOOKS_DIR/pre-compact.sh" ]; then
     echo "Generating .claude/settings.json with hooks..."
-    # Exact copy of ebblyn format, paths updated
+    # Standard Claude Code hooks config, paths updated
     cat > "$SETTINGS_FILE" << EOF
 {
   "hooks": {

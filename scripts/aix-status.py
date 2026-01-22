@@ -97,7 +97,7 @@ def status_report(args: argparse.Namespace) -> Dict[str, Any]:
         framework_root = Path(args.framework_root)
     else:
         env_path = os.environ.get("AIX_FRAMEWORK")
-        framework_root = Path(env_path) if env_path else Path.home() / "Gitea" / "aix"
+        framework_root = Path(env_path) if env_path else Path.home() / "tools" / "aix"
 
     registry_path = framework_root / "registry.tsv"
 

@@ -2,17 +2,17 @@
 #
 # PreCompact Hook - Save workflow state before context compaction
 #
-# Updates .ai-handoff.md with a snapshot section containing current git state.
+# Updates .aix-handoff.md with a snapshot section containing current git state.
 # The post-compact hook reads this file to restore context after compaction.
 #
 # Claude Code Hook Events:
 #   - Trigger: PreCompact
-#   - Output: Updates .ai-handoff.md file
+#   - Output: Updates .aix-handoff.md file
 #
 
 set -euo pipefail
 
-HANDOFF_FILE=".ai-handoff.md"
+HANDOFF_FILE=".aix-handoff.md"
 SNAPSHOT_START="<!-- COMPACTION_SNAPSHOT_START -->"
 SNAPSHOT_END="<!-- COMPACTION_SNAPSHOT_END -->"
 

@@ -161,9 +161,9 @@ Implement approved proposals? [Select numbers or 'all']:
 
 | File | Purpose |
 |------|---------|
-| `.ai/state/retrospectives/YYYY-MM-DD.md` | Analysis report |
-| `.ai/state/proposals/pending.md` | Unapproved proposals |
-| `.ai/state/proposals/implemented.md` | Completed improvements |
+| `.aix/state/retrospectives/YYYY-MM-DD.md` | Analysis report |
+| `.aix/state/proposals/pending.md` | Unapproved proposals |
+| `.aix/state/proposals/implemented.md` | Completed improvements |
 
 ## Proposal Format
 

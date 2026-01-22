@@ -37,8 +37,8 @@ AIX defines a provider-agnostic interface for task management. Implementations c
 │  └─────────────┘  └─────────────┘  └─────────────┘             │
 │                                                                 │
 │  ┌─────────────┐  ┌─────────────┐                               │
-│  │   Ebblyn    │  │   Custom    │                               │
-│  │   Boards    │  │   Board     │                               │
+│  │   Custom    │  │  Self-hosted│                               │
+│  │   Board     │  │   System    │                               │
 │  └─────────────┘  └─────────────┘                               │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
@@ -281,7 +281,7 @@ task:
 ## Implementing an Adapter
 
 > **For implementers**: Follow this pattern when creating a new task manager adapter.
-> Currently, the only reference implementation is [ebblyn-ecosystem/.ai/skills/ebblyn-*](https://github.com/ebblyn/ebblyn-ecosystem).
+> AIX does not ship a reference implementation yet.
 
 ### Required Files
 
@@ -384,7 +384,7 @@ Retrieve tasks from your configured task manager.
 1. Task manager adapter configured in `.aix/config.yaml`:
    ```yaml
    task_manager:
-     adapter: github  # or: linear, jira, ebblyn
+     adapter: github  # or: linear, jira, custom
    ```
 
 2. Adapter credentials in `.aix/env/{adapter}.env`
@@ -421,20 +421,19 @@ task_manager:
 ## Provider Comparison (Planned)
 
 > **Note**: No implementations exist yet in AIX. This table shows theoretical capability.
-> The only working implementation is Ebblyn Boards in [ebblyn-ecosystem](https://github.com/ebblyn/ebblyn-ecosystem).
 
-| Feature | GitHub | Linear | Jira | Ebblyn |
+| Feature | GitHub | Linear | Jira | Custom |
 |---------|--------|--------|------|--------|
-| get-task | 🔮 | 🔮 | 🔮 | ✅ |
-| create-task | 🔮 | 🔮 | 🔮 | ✅ |
-| update-task | 🔮 | 🔮 | 🔮 | ✅ |
-| start-task | 🔮 | 🔮 | 🔮 | ✅ |
-| close-task | 🔮 | 🔮 | 🔮 | ✅ |
-| comment-task | 🔮 | 🔮 | 🔮 | ✅ |
-| priorities | 🔮 | 🔮 | 🔮 | ✅ |
-| relate-task | 🔮 | 🔮 | 🔮 | ✅ |
+| get-task | 🔮 | 🔮 | 🔮 | varies |
+| create-task | 🔮 | 🔮 | 🔮 | varies |
+| update-task | 🔮 | 🔮 | 🔮 | varies |
+| start-task | 🔮 | 🔮 | 🔮 | varies |
+| close-task | 🔮 | 🔮 | 🔮 | varies |
+| comment-task | 🔮 | 🔮 | 🔮 | varies |
+| priorities | 🔮 | 🔮 | 🔮 | varies |
+| relate-task | 🔮 | 🔮 | 🔮 | varies |
 
-Legend: ✅ Implemented | 🔮 Planned/Possible
+Legend: ✅ Implemented | 🔮 Planned/Possible | varies = depends on implementation
 
 ---
 

@@ -1,11 +1,11 @@
 #!/bin/bash
 # Adopt individual capabilities from higher tiers without full upgrade
-# Usage: ~/Gitea/aix/adopt.sh <capability-name>
-#        ~/Gitea/aix/adopt.sh --list
+# Usage: ~/tools/aix/adopt.sh <capability-name>
+#        ~/tools/aix/adopt.sh --list
 
 set -e
 
-AIX_FRAMEWORK="${AIX_FRAMEWORK:-$HOME/Gitea/aix}"
+AIX_FRAMEWORK="${AIX_FRAMEWORK:-$HOME/tools/aix}"
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 AIX_DIR="$REPO_ROOT/.aix"
 TIER_FILE="$AIX_DIR/tier.yaml"

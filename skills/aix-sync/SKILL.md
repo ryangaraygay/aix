@@ -23,7 +23,7 @@ Update a repo's AIX files to the latest framework state while preserving local a
 ## Procedure
 
 1. **Resolve framework path**
-   - Use input `framework_path`, else `$AIX_FRAMEWORK`, else `~/Gitea/aix`.
+   - Use input `framework_path`, else `$AIX_FRAMEWORK`, else `~/tools/aix`.
 2. **Read current state**
    - `.aix/tier.yaml` for `tier`, `adopted`, and `aix_version` (if present).
    - `.aix/manifest.json` and `.aix/snapshots/` if available.

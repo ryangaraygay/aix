@@ -55,7 +55,7 @@ If task management is configured:
 
 **Detection methods (in order):**
 1. **ID in branch name**: If branch is `feat/{id}` or contains a task ID pattern, fetch that task
-2. **Handoff file**: Check `.ai-handoff.md` for `## Task:` line
+2. **Handoff file**: Check `.aix-handoff.md` for `## Task:` line
 3. **Search by name**: Search task system for tasks matching the branch/worktree name
 
 **If a task is found:**
@@ -122,6 +122,6 @@ This skill can be enhanced with task management integration. See your project's 
 
 | Integration | Configuration |
 |-------------|---------------|
-| GitHub Issues | Set up in `.ai/config.yaml` |
-| Linear | Set up in `.ai/config.yaml` |
-| Custom board | Provide API credentials in `.ai/env/` |
+| GitHub Issues | Set up in `.aix/config.yaml` |
+| Linear | Set up in `.aix/config.yaml` |
+| Custom board | Provide API credentials in `.aix/env/` |

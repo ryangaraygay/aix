@@ -54,7 +54,7 @@ Triggered before Claude Code compacts the conversation context.
 }
 ```
 
-**Side Effect**: Updates `.ai-handoff.md` with git state snapshot.
+**Side Effect**: Updates `.aix-handoff.md` with git state snapshot.
 
 ### Post-Compact Hook (SessionStart)
 
@@ -114,7 +114,7 @@ The validate-bash hook blocks these destructive operations:
 
 ## Handoff File Format
 
-The `.ai-handoff.md` file preserves workflow state:
+The `.aix-handoff.md` file preserves workflow state:
 
 ```markdown
 ## Current Phase: implementation

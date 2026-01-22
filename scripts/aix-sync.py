@@ -59,7 +59,7 @@ def _resolve_framework_root(path: Optional[str]) -> Path:
     env_path = os.environ.get("AIX_FRAMEWORK")
     if env_path:
         return Path(env_path)
-    return Path.home() / "Gitea" / "aix"
+    return Path.home() / "tools" / "aix"
 
 
 def sync(args: argparse.Namespace) -> Dict[str, Any]:

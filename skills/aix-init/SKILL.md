@@ -10,7 +10,7 @@ metadata:
   outputs: |
     - .aix/ directory with framework files
     - CLAUDE.md symlink
-    - .claude/ directory with agents.md and skills symlink
+    - .claude/ directory with agents/ and skills symlink
     - docs/product.md, docs/tech-stack.md, docs/design.md templates
 ---
 
@@ -23,7 +23,7 @@ Initialize or upgrade the aix framework in your project.
 > **IMPORTANT**: This skill MUST run the actual scripts from the aix framework.
 > Do NOT generate or improvise role/workflow content. The framework files are canonical.
 
-**Framework location**: `~/Gitea/aix` (or `$AIX_FRAMEWORK` if set)
+**Framework location**: `~/tools/aix` (or `$AIX_FRAMEWORK` if set)
 
 ## Usage
 
@@ -37,35 +37,35 @@ Initialize or upgrade the aix framework in your project.
 
 Run the bootstrap script:
 ```bash
-~/Gitea/aix/bootstrap.sh
+~/tools/aix/bootstrap.sh
 ```
 
 ## For Upgrade (existing project)
 
 Run the upgrade script:
 ```bash
-~/Gitea/aix/upgrade.sh [target-tier]
+~/tools/aix/upgrade.sh [target-tier]
 ```
 
 Example:
 ```bash
-~/Gitea/aix/upgrade.sh 1   # Upgrade to Tier 1
-~/Gitea/aix/upgrade.sh     # Upgrade to next tier (current + 1)
+~/tools/aix/upgrade.sh 1   # Upgrade to Tier 1
+~/tools/aix/upgrade.sh     # Upgrade to next tier (current + 1)
 ```
 
 ## For Adopt (cherry-pick capabilities)
 
 Adopt individual capabilities from higher tiers without full upgrade:
 ```bash
-~/Gitea/aix/adopt.sh --list              # List available capabilities
-~/Gitea/aix/adopt.sh <capability-name>   # Adopt a specific capability
+~/tools/aix/adopt.sh --list              # List available capabilities
+~/tools/aix/adopt.sh <capability-name>   # Adopt a specific capability
 ```
 
 Example:
 ```bash
-~/Gitea/aix/adopt.sh --list           # See what's available
-~/Gitea/aix/adopt.sh agent-browser    # Adopt browser automation skill
-~/Gitea/aix/adopt.sh commit           # Adopt commit skill
+~/tools/aix/adopt.sh --list           # See what's available
+~/tools/aix/adopt.sh agent-browser    # Adopt browser automation skill
+~/tools/aix/adopt.sh commit           # Adopt commit skill
 ```
 
 ### When to Use Adopt vs Upgrade
@@ -140,7 +140,7 @@ Usually starts at Tier 0 (Seed).
 mkdir -p .aix/{roles,workflows,skills,state}
 
 # Copy tier files
-cp -r aix/tiers/0-seed/* .aix/
+cp -r "$AIX_FRAMEWORK/tiers/0-seed/"* .aix/
 
 # Create tier.yaml
 cat > .aix/tier.yaml << EOF
@@ -164,13 +164,16 @@ If not present, create templates:
 ### 6. Setup Claude Code
 
 ```bash
-# Run Claude Code adapter
-./aix/adapters/claude-code/generate.sh 0
+# Run Claude Code adapter (submodule)
+./.aix/adapters/claude-code/generate.sh 0
+
+# Or run from the framework repo
+$AIX_FRAMEWORK/adapters/claude-code/generate.sh 0
 ```
 
 Creates:
 - `CLAUDE.md` symlink
-- `.claude/agents.md`
+- `.claude/agents/` symlink
 - `.claude/skills/` symlink
 
 ### 7. Summary
@@ -191,7 +194,7 @@ Created:
       └── standard.md
 
   CLAUDE.md → .aix/constitution.md
-  .claude/agents.md
+  .claude/agents/
 
   docs/
   ├── product.md (template - please fill in)
@@ -259,10 +262,10 @@ Proceed? [Yes / Customize / Skip]
 
 ```bash
 # Add tier additions
-cp -r aix/tiers/1-sprout/* .aix/
+cp -r "$AIX_FRAMEWORK/tiers/1-sprout/"* .aix/
 
 # Update tier.yaml
-# Update .claude/agents.md
+# Update .claude/agents/
 # Setup hooks if applicable
 ```
 
@@ -281,7 +284,7 @@ Added:
 
 Updated:
   - .aix/tier.yaml
-  - .claude/agents.md
+  - .claude/agents/
 
 Next tier (Tier 2 - Grow) adds:
   - GitHub Actions CI

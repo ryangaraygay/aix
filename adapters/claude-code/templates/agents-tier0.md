@@ -1,7 +1,7 @@
 # Agent Definitions
 
 > Auto-generated from aix roles. Do not edit directly.
-> Regenerate with: `./aix/adapters/claude-code/generate.sh`
+> Regenerate with the Claude Code adapter script (see the AIX adoption guide in the framework repo).
 
 ## analyst
 

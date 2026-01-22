@@ -55,7 +55,7 @@ aix grows with your project:
 mkdir my-project && cd my-project
 
 # Bootstrap aix (run from your project directory)
-~/Gitea/aix/bootstrap.sh
+~/tools/aix/bootstrap.sh
 
 # Open Claude Code
 claude
@@ -65,7 +65,7 @@ claude
 
 ```bash
 cd my-existing-project
-~/Gitea/aix/bootstrap.sh
+~/tools/aix/bootstrap.sh
 ```
 
 ### Upgrading

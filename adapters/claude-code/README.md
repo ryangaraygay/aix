@@ -7,19 +7,20 @@ This adapter generates Claude Code-specific files from aix framework components.
 | Source | Generated | Purpose |
 |--------|-----------|---------|
 | `.aix/constitution.md` | `CLAUDE.md` (symlink) | Entry point for Claude |
-| `.aix/roles/*.md` | `.claude/agents.md` | Agent type definitions |
+| `.aix/roles/*.md` | `.claude/agents/` (symlink) | Agent type definitions |
 | `.aix/skills/` | `.claude/skills/` (symlink) | Skill availability |
 
 ## Usage
 
-After `/aix-init`, run:
+After `/aix-init`, the adapter runs automatically. To regenerate manually:
 
 ```bash
-# Generate Claude Code files
-./aix/adapters/claude-code/generate.sh
-```
+# If AIX is a submodule
+./.aix/adapters/claude-code/generate.sh 0
 
-Or this is done automatically by `/aix-init`.
+# If AIX is installed elsewhere
+$AIX_FRAMEWORK/adapters/claude-code/generate.sh 0
+```
 
 ## Files
 
@@ -27,20 +28,14 @@ Or this is done automatically by `/aix-init`.
 
 Symlink to `.aix/constitution.md`. Claude Code reads this as the project instruction file.
 
-### .claude/agents.md
+### .claude/agents/
 
-Defines available agent types based on your tier's roles. Example:
+Defines available agent types based on your tier's roles. Each role is a file.
 
 ```markdown
-## analyst
-- Description: Plan and architect solutions
-- Tools: Read, Bash, Grep, Glob
-- Instructions: Follow .aix/roles/analyst.md
-
-## coder
-- Description: Implement code according to spec
-- Tools: Read, Write, Edit, Bash, Grep, Glob
-- Instructions: Follow .aix/roles/coder.md
+# Example role file: .aix/roles/analyst.md
+## Identity
+[role definition]
 ```
 
 ### .claude/skills/
@@ -58,9 +53,10 @@ ln -s .aix/constitution.md CLAUDE.md
 # Create .claude directory
 mkdir -p .claude
 
+# Create agents symlink (adjust path if using submodule tiers)
+ln -s ../.aix/roles .claude/agents
+
 # Create skills symlink
 ln -s ../.aix/skills .claude/skills
 
-# Copy agents.md template and customize
-cp aix/adapters/claude-code/templates/agents.md .claude/agents.md
 ```

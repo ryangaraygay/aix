@@ -1,10 +1,10 @@
 #!/bin/bash
 # Upgrade aix to a higher tier
-# Usage: ~/Gitea/aix/upgrade.sh [target-tier]
+# Usage: ~/tools/aix/upgrade.sh [target-tier]
 
 set -e
 
-AIX_FRAMEWORK="${AIX_FRAMEWORK:-$HOME/Gitea/aix}"
+AIX_FRAMEWORK="${AIX_FRAMEWORK:-$HOME/tools/aix}"
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 AIX_DIR="$REPO_ROOT/.aix"
 TIER_FILE="$AIX_DIR/tier.yaml"

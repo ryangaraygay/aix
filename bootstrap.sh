@@ -1,12 +1,12 @@
 #!/bin/bash
 # Bootstrap aix in a new project
-# Usage: curl -fsSL https://raw.githubusercontent.com/ryangaraygay/aix/main/bootstrap.sh | bash
-#    or: ~/Gitea/aix/bootstrap.sh
+# Usage: curl -fsSL https://raw.githubusercontent.com/ebblyn/aix/main/bootstrap.sh | bash
+#    or: ~/tools/aix/bootstrap.sh
 
 set -e
 
 # Where is the aix framework?
-AIX_FRAMEWORK="${AIX_FRAMEWORK:-$HOME/Gitea/aix}"
+AIX_FRAMEWORK="${AIX_FRAMEWORK:-$HOME/tools/aix}"
 
 # Detect if we're in a git repo
 if git rev-parse --git-dir > /dev/null 2>&1; then

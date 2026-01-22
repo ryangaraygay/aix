@@ -2,7 +2,7 @@
 #
 # Post-Compact Hook (SessionStart with "compact" matcher)
 #
-# Reads .ai-handoff.md and outputs JSON with additionalContext for Claude Code
+# Reads .aix-handoff.md and outputs JSON with additionalContext for Claude Code
 # to inject into the session context after compaction.
 #
 # Claude Code Hook Events:
@@ -14,7 +14,7 @@
 
 set -euo pipefail
 
-HANDOFF_FILE=".ai-handoff.md"
+HANDOFF_FILE=".aix-handoff.md"
 
 # Build the context string
 build_context() {
@@ -36,7 +36,7 @@ build_context() {
         cat "$HANDOFF_FILE"
         echo ""
     else
-        echo "### WARNING: No .ai-handoff.md found"
+        echo "### WARNING: No .aix-handoff.md found"
         echo ""
         echo "Gather state manually:"
         echo ""
