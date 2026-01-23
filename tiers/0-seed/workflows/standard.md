@@ -135,3 +135,60 @@ If blocked (missing info, dependencies, permissions):
 | Implement | coder | Tests pass |
 | Review | reviewer | No critical/high issues |
 | Complete | - | User approves merge |
+
+---
+
+## Iteration Limits
+
+| Loop | Max Iterations | On Exceed |
+|------|----------------|-----------|
+| Coder → Reviewer | 3 | Escalate to user |
+
+After 3 coder-reviewer cycles without resolution, escalate rather than continue looping.
+
+---
+
+## Exit Status
+
+When workflow cannot converge, report using this format:
+
+```
+EXIT_STATUS: needs_human_review
+REASON: [specific reason - e.g., "Reviewer rejected 3 times - cannot converge"]
+ATTEMPTS: [number of iterations]
+LAST_ISSUES: [list of unresolved issues with severity codes]
+```
+
+**Example:**
+```
+EXIT_STATUS: needs_human_review
+REASON: Reviewer rejected 3 times - test coverage insufficient
+ATTEMPTS: 3
+LAST_ISSUES: [H-001: Missing edge case tests, M-002: Error handling unclear]
+```
+
+---
+
+## Verification Checklist
+
+Before marking workflow complete, verify:
+
+- [ ] All tests pass
+- [ ] No CRITICAL or HIGH severity issues remain
+- [ ] Acceptance criteria from spec are met
+
+---
+
+## When Running Under Orchestration
+
+When this workflow is executed by an external orchestrator (e.g., AIX-Factor):
+
+**DO NOT:**
+- Check CI status (orchestrator handles this)
+- Create or manage PRs (orchestrator handles this)
+- Push to remote (orchestrator handles this)
+- Check GitHub Actions (orchestrator handles this)
+
+**Focus on:** analyze → implement → review → commit locally
+
+The orchestrator handles push, PR creation, and external verification.

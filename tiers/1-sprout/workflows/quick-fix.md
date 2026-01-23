@@ -143,3 +143,61 @@ If during quick-fix you discover:
 - Add new API parameter
 - Performance optimization
 ```
+
+---
+
+## Iteration Limits
+
+| Loop | Max Iterations | On Exceed |
+|------|----------------|-----------|
+| Coder → Reviewer | 2 | Escalate to user |
+
+Quick-fix has a **stricter limit** than standard workflow. If it takes more than 2 iterations, the fix isn't "quick" - escalate or switch to standard workflow.
+
+---
+
+## Exit Status
+
+When workflow cannot converge, report using this format:
+
+```
+EXIT_STATUS: needs_human_review
+REASON: [specific reason]
+ATTEMPTS: [number of iterations]
+LAST_ISSUES: [list of unresolved issues]
+```
+
+**Example:**
+```
+EXIT_STATUS: needs_human_review
+REASON: Fix more complex than expected - switch to standard workflow
+ATTEMPTS: 2
+LAST_ISSUES: [H-001: Multiple files affected, M-001: Needs architectural review]
+```
+
+---
+
+## Verification Checklist
+
+Before marking workflow complete, verify:
+
+- [ ] All tests pass
+- [ ] Failing test was written first (TDD for bugs)
+- [ ] No CRITICAL issues remain
+- [ ] Change is focused (single concern)
+
+---
+
+## When Running Under Orchestration
+
+When this workflow is executed by an external orchestrator (e.g., AIX-Factor):
+
+**DO NOT:**
+- Check CI status (orchestrator handles this)
+- Create or manage PRs (orchestrator handles this)
+- Push to remote (orchestrator handles this)
+- Check GitHub Actions (orchestrator handles this)
+
+**Focus on:** implement → review → commit locally
+
+The orchestrator handles push, PR creation, and external verification.

@@ -388,3 +388,61 @@ Check `doc_impact` from analyst plan:
 - No tech debt logged
 - Task closed
 ```
+
+---
+
+## Iteration Limits
+
+| Loop | Max Iterations | On Exceed |
+|------|----------------|-----------|
+| Coder → Reviewer → Tester | 5 | Escalate to user |
+
+Refactor workflow allows more iterations than standard/quick-fix due to complexity. After 5 iterations without resolution, escalate.
+
+---
+
+## Exit Status
+
+When workflow cannot converge, report using this format:
+
+```
+EXIT_STATUS: needs_human_review
+REASON: [specific reason]
+ATTEMPTS: [number of iterations]
+LAST_ISSUES: [list of unresolved issues with severity codes]
+```
+
+**Example:**
+```
+EXIT_STATUS: needs_human_review
+REASON: Circular dependency discovered during restructure
+ATTEMPTS: 4
+LAST_ISSUES: [H-001: Breaking import in moduleA, M-002: Test isolation failure]
+```
+
+---
+
+## Verification Checklist
+
+Before marking workflow complete, verify:
+
+- [ ] All tests pass (no regressions)
+- [ ] No CRITICAL or HIGH severity issues remain
+- [ ] All acceptance criteria from plan are met
+- [ ] Architectural alignment verified by reviewer
+
+---
+
+## When Running Under Orchestration
+
+When this workflow is executed by an external orchestrator (e.g., AIX-Factor):
+
+**DO NOT:**
+- Check CI status (orchestrator handles this)
+- Create or manage PRs (orchestrator handles this)
+- Push to remote (orchestrator handles this)
+- Check GitHub Actions (orchestrator handles this)
+
+**Focus on:** triage (optional) → analyst → implement loop → docs → commit locally
+
+The orchestrator handles push, PR creation, and external verification.

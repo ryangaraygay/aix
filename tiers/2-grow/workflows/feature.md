@@ -416,3 +416,61 @@ START
   ▼
 END
 ```
+
+---
+
+## Iteration Limits
+
+| Loop | Max Iterations | On Exceed |
+|------|----------------|-----------|
+| Coder → Reviewer → Tester | 5 | Escalate to user |
+
+Feature workflow allows more iterations than standard/quick-fix due to complexity. After 5 iterations without resolution, escalate.
+
+---
+
+## Exit Status
+
+When workflow cannot converge, report using this format:
+
+```
+EXIT_STATUS: needs_human_review
+REASON: [specific reason]
+ATTEMPTS: [number of iterations]
+LAST_ISSUES: [list of unresolved issues with severity codes]
+```
+
+**Example:**
+```
+EXIT_STATUS: needs_human_review
+REASON: Tester found edge case that requires architectural decision
+ATTEMPTS: 4
+LAST_ISSUES: [H-001: Race condition in concurrent updates, M-002: Test flaky on CI]
+```
+
+---
+
+## Verification Checklist
+
+Before marking workflow complete, verify:
+
+- [ ] All tests pass (unit, component, integration)
+- [ ] No CRITICAL or HIGH severity issues remain
+- [ ] All acceptance criteria from spec are met
+- [ ] Tester has verified edge cases
+
+---
+
+## When Running Under Orchestration
+
+When this workflow is executed by an external orchestrator (e.g., AIX-Factor):
+
+**DO NOT:**
+- Check CI status (orchestrator handles this)
+- Create or manage PRs (orchestrator handles this)
+- Push to remote (orchestrator handles this)
+- Check GitHub Actions (orchestrator handles this)
+
+**Focus on:** triage → analyst → implement loop → docs → commit locally
+
+The orchestrator handles push, PR creation, and external verification.
