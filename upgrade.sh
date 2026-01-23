@@ -175,16 +175,35 @@ for ((tier = CURRENT_TIER + 1; tier <= TARGET_TIER; tier++)); do
             record_manifest_dir "$TIER_DIR/hooks" "$AIX_DIR/hooks" "tier-$tier-$TIER_NAME"
             echo -e "  ${YELLOW}Note: Configure hooks in .claude/settings.json${NC}"
         else
-            # Git hooks go to .husky
+            # Git hooks - use .husky if package.json exists, otherwise .git/hooks
             echo "  Adding git hooks..."
-            mkdir -p "$REPO_ROOT/.husky"
-            for hook in "$TIER_DIR/hooks/"*; do
-                if [ -f "$hook" ]; then
-                    hook_name=$(basename "$hook")
-                    cp "$hook" "$REPO_ROOT/.husky/$hook_name"
-                    chmod +x "$REPO_ROOT/.husky/$hook_name"
+            if [ -f "$REPO_ROOT/package.json" ]; then
+                # Node.js project - use husky
+                mkdir -p "$REPO_ROOT/.husky"
+                for hook in "$TIER_DIR/hooks/"*; do
+                    if [ -f "$hook" ]; then
+                        hook_name=$(basename "$hook")
+                        cp "$hook" "$REPO_ROOT/.husky/$hook_name"
+                        chmod +x "$REPO_ROOT/.husky/$hook_name"
+                    fi
+                done
+                echo -e "  ${YELLOW}Note: Ensure husky is installed (npm install husky --save-dev && npx husky install)${NC}"
+            else
+                # Non-Node project - use .git/hooks directly
+                GIT_HOOKS_DIR="$REPO_ROOT/.git/hooks"
+                if [ -d "$GIT_HOOKS_DIR" ]; then
+                    for hook in "$TIER_DIR/hooks/"*; do
+                        if [ -f "$hook" ]; then
+                            hook_name=$(basename "$hook")
+                            cp "$hook" "$GIT_HOOKS_DIR/$hook_name"
+                            chmod +x "$GIT_HOOKS_DIR/$hook_name"
+                        fi
+                    done
+                    echo -e "  ${GREEN}Git hooks installed to .git/hooks/${NC}"
+                else
+                    echo -e "  ${YELLOW}Warning: .git/hooks not found. Skipping git hooks.${NC}"
                 fi
-            done
+            fi
         fi
     fi
 
