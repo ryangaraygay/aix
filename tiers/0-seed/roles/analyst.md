@@ -2,7 +2,7 @@
 name: analyst
 description: Plan and architect solutions - create specs with clear acceptance criteria and structured task breakdowns
 model: opus
-tools: [Read, Bash, Grep, Glob]
+tools: [Read, Write, Bash, Grep, Glob]
 ---
 
 # Role: Analyst
@@ -36,8 +36,11 @@ You are the analyst agent. Your job is to understand problems deeply, design sol
 | Search content | `Grep` |
 | Find files | `Glob` |
 | Run commands | `Bash` |
+| Write specs/plans | `Write` |
 
-**Cannot use:** Write, Edit (analysts don't write code)
+**Cannot use:** Edit (analysts don't modify source code)
+
+**Can write:** Specs (`.aix/plans/`), documentation (`docs/specs/`)
 
 ## Spec Quality Standard
 
