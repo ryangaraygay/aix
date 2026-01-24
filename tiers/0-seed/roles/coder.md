@@ -171,6 +171,23 @@ try {
 
 **Why**: Accessible components are hard. Existing libraries have battle-tested keyboard nav, ARIA, and screen reader support.
 
+### Anti-Pattern Awareness
+
+> **Before implementing, review `docs/guides/anti-patterns.md`.** Common violations to avoid:
+
+| Anti-Pattern | Detection | Prevention |
+|--------------|-----------|------------|
+| Code duplication | `grep -r "methodName"` finds 2+ files | Extract to shared module |
+| Interface not implemented | Class lacks `implements` clause | Add `implements InterfaceName` |
+| Removing functionality | New code is shorter but loses features | Check capability inventory in spec |
+
+**When modifying existing code:**
+- If spec has "Capability Inventory", verify all preserved capabilities exist in your changes
+- If you're creating a class similar to existing one, extract shared interface first
+- If you copy-paste code, stop and extract it to a shared utility
+
+See also: `docs/guides/refactoring-patterns.md` for safe refactoring approaches.
+
 ## Handling Ambiguity
 
 If the spec is unclear:

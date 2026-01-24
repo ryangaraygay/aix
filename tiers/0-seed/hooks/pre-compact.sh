@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # PreCompact Hook - Save workflow state before context compaction
 #
@@ -10,17 +10,18 @@
 #   - Output: Updates .aix-handoff.md file
 #
 
-set -euo pipefail
+# Don't use strict mode - we want the hook to succeed even if parts fail
+# set -euo pipefail
 
 HANDOFF_FILE=".aix-handoff.md"
 SNAPSHOT_START="<!-- COMPACTION_SNAPSHOT_START -->"
 SNAPSHOT_END="<!-- COMPACTION_SNAPSHOT_END -->"
 
 # Read hook input from stdin (contains trigger info)
-INPUT=$(cat)
+INPUT=$(cat 2>/dev/null || echo '{}')
 TRIGGER=$(echo "$INPUT" | jq -r '.trigger // "unknown"' 2>/dev/null || echo "unknown")
 
-# Capture git state
+# Capture git state (with fallbacks)
 CURRENT_BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 GIT_STATUS=$(git status --short 2>/dev/null || echo "(no changes)")
 UNCOMMITTED_COUNT=$(echo "$GIT_STATUS" | grep -c '^' 2>/dev/null || echo "0")
@@ -49,15 +50,18 @@ update_handoff() {
             $0 == start { in_block = 1; next }
             $0 == end { in_block = 0; next }
             !in_block { print }
-        ' "$HANDOFF_FILE" > "${HANDOFF_FILE}.tmp"
-        mv "${HANDOFF_FILE}.tmp" "$HANDOFF_FILE"
+        ' "$HANDOFF_FILE" > "${HANDOFF_FILE}.tmp" 2>/dev/null
+        mv "${HANDOFF_FILE}.tmp" "$HANDOFF_FILE" 2>/dev/null || true
     else
         # Create minimal handoff if none exists
         cat << 'EOF' > "$HANDOFF_FILE"
-## Current Phase: unknown
-## Completed By: system
+# Session Handoff
+
+> Auto-generated before compaction.
+
 ## Status: interrupted
-## Summary: Auto-generated before compaction.
+
+No handoff file existed. Please gather state manually.
 EOF
     fi
 
@@ -65,7 +69,7 @@ EOF
     {
         printf '\n%s\n' "$SNAPSHOT_START"
         printf '## Compaction Snapshot\n'
-        printf -- '- Timestamp: %s\n' "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+        printf -- '- Timestamp: %s\n' "$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || date)"
         printf -- '- Trigger: %s\n' "$TRIGGER"
         printf -- '- Branch: %s\n' "$CURRENT_BRANCH"
         printf -- '- Worktree: %s\n' "$WORKTREE_NAME"

@@ -60,6 +60,60 @@ Before writing the spec:
 4. **Identify patterns** - how do similar things work in this codebase?
 5. **Note constraints** - performance, compatibility, accessibility
 
+## Capability Inventory (For Modifications)
+
+> **Required when modifying existing code.** Skip for greenfield features.
+
+Before proposing changes to existing components, document all capabilities in the affected code. This prevents accidentally removing functionality during "improvements."
+
+### When This Applies
+
+- Refactoring existing modules
+- Adding features to existing classes/components
+- Migrating code to new architecture
+- "Simplifying" or "cleaning up" code
+
+### Required Actions
+
+1. **List all capabilities** in the components you'll modify
+2. **Include location** (file:line) for each capability
+3. **Note test coverage** - is each capability tested?
+4. **Mark preservation status** - will it be preserved, modified, or removed?
+
+### Spec Section (Mandatory for Modifications)
+
+Add to spec after Acceptance Criteria:
+
+```markdown
+## Existing Capability Inventory
+
+**Components affected:** [list files being modified]
+
+| Capability | Location | Has Tests? | Preserved? |
+|------------|----------|------------|------------|
+| Retry with configurable categories | orchestrator.ts:157-169 | ✅ spec:45 | ✅ Yes |
+| Cost cap enforcement | orchestrator.ts:318-325 | ✅ spec:112 | ✅ Yes |
+| Escalation parsing | orchestrator.ts:298-306 | ❌ No | ❌ Removing (see Out of Scope) |
+| State persistence | orchestrator.ts:78-110 | ✅ spec:23 | ✅ Yes |
+
+### Capabilities Being Removed
+
+If any capability is marked "❌ Removing", explain in Out of Scope section:
+- Why it's being removed
+- Impact on existing users
+- Migration path (if any)
+```
+
+### Why This Matters
+
+Without capability inventory:
+- Refactors silently drop features
+- "Cleaner" code loses battle-tested functionality
+- Users discover regressions in production
+- Code reviews miss what's absent (easier to review what's present)
+
+See `docs/guides/anti-patterns.md` #3: "Removing Existing Functionality During Improvements"
+
 ## Infrastructure Isolation
 
 > **Never bundle infrastructure changes with feature work.**

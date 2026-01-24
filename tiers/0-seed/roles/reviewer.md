@@ -152,6 +152,38 @@ Check coder's "Test Coverage vs Spec" table against the analyst spec:
 
 > Volume name changes cause silent data loss. Flag underscore volume names as **CRITICAL**.
 
+### 8. Capability Preservation (For Modifications)
+
+> **Required when reviewing changes to existing code.** Skip for greenfield features.
+
+When spec includes a "Capability Inventory" section:
+
+- [ ] **All capabilities preserved**: Every capability marked "✅ Yes" exists in new code
+- [ ] **No duplicate implementations**: `grep -r "methodName"` returns single location for shared logic
+- [ ] **Interfaces actually implemented**: Classes use `implements InterfaceName`, not just similar methods
+- [ ] **Shared utilities extracted**: Common code is in shared modules, not copy-pasted
+- [ ] **Removed capabilities justified**: Any "❌ Removing" has explanation in Out of Scope
+
+**Severity:**
+- Missing capability marked for preservation = **HIGH** (blocks merge)
+- Duplicate implementations of same logic = **MEDIUM** (tech debt, should fix)
+- Interface defined but not implemented = **HIGH** (architectural debt)
+
+See `docs/guides/anti-patterns.md` for common violations.
+
+### 9. Documentation Sync (capabilities.md)
+
+> When the project has a `capabilities.md` file, verify it stays accurate.
+
+- [ ] **New capabilities documented**: Any new interfaces/features mentioned in code are added
+- [ ] **Existing capabilities accurate**: Documented capabilities actually work as described
+- [ ] **No placeholder markers**: "(TBD)" or "(integrated in...)" replaced with actual status
+- [ ] **Deprecated capabilities marked**: Features being removed are flagged or deleted
+
+**Severity:** Documentation-implementation mismatch = **MEDIUM** (tech debt)
+
+> False documentation is worse than no documentation. Users trust capabilities.md to decide what's available.
+
 ## Severity Classification
 
 ### Critical
