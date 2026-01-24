@@ -50,13 +50,53 @@ This is a Claude Code limitation, not an AIX bug. Claude Code reads configuratio
 
 ## Planned Improvements
 
-_None currently tracked._
+### Legacy Codebase Workflows
+
+**Tier:** 2 (Grow)
+**Component:** `workflows/`
+**Status:** Planned
+
+Workflows for safely working with existing codebases that lack tests or have unclear behavior.
+
+**Planned Workflows:**
+
+| Workflow | Purpose |
+|----------|---------|
+| `codebase-audit` | Analyze existing codebase - security, dependencies, architecture, risk areas |
+| `characterize` | Write characterization tests capturing current behavior before refactoring |
+| `safe-refactor` | Transform code while preserving behavior (uses characterization tests as safety net) |
+
+**Use Cases:**
+- Legacy codebase modernization
+- Taking over projects with no tests
+- Refactoring tightly-coupled code safely
 
 ---
 
 ## Future Ideas
 
-_None currently tracked._
+### Characterization Test Skill
+
+**Tier:** 2 (Grow)
+**Component:** `skills/`
+**Status:** Idea
+
+AI-driven generation of behavior-capturing tests for existing code. Documents what code *does* (not what it *should* do) as a safety net before refactoring.
+
+---
+
+### Codebase Audit Skill
+
+**Tier:** 2 (Grow)
+**Component:** `skills/`
+**Status:** Idea
+
+Automated analysis skill that produces actionable report:
+- Security scan results
+- Dependency audit
+- Architecture coupling assessment
+- High-risk change areas
+- Recommended approach
 
 ---
 
