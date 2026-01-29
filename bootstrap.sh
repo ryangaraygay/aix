@@ -148,12 +148,14 @@ if [ -f "$REPO_ROOT/.gitignore" ]; then
         echo "" >> "$REPO_ROOT/.gitignore"
         echo "# aix state (ephemeral)" >> "$REPO_ROOT/.gitignore"
         echo ".aix/state/" >> "$REPO_ROOT/.gitignore"
+        echo ".aix/sync/" >> "$REPO_ROOT/.gitignore"
         echo ".aix-handoff.md" >> "$REPO_ROOT/.gitignore"
     fi
 else
     cat > "$REPO_ROOT/.gitignore" << EOF
 # aix state (ephemeral)
 .aix/state/
+.aix/sync/
 .aix-handoff.md
 EOF
 fi
