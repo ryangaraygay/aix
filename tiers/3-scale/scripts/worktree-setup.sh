@@ -491,10 +491,50 @@ for idx in "${!SERVICE_NAMES[@]}"; do
         continue
     fi
 
-    main_service_dir="$MAIN_REPO/$service_path"
-    worktree_service_dir="$WORKTREE_PATH/$service_path"
-    main_env_path="$main_service_dir/$shared_env"
-    worktree_env_path="$worktree_service_dir/$shared_env"
+    # Validate shared_env path (same security checks as env_file)
+    if ! validated_paths=$(python3 - "$MAIN_REPO" "$WORKTREE_PATH" "$service_path" "$shared_env" <<'PY'
+import os
+import sys
+
+main_repo = os.path.realpath(sys.argv[1])
+worktree_path = os.path.realpath(sys.argv[2])
+service_path = sys.argv[3]
+shared_env = sys.argv[4]
+
+# Reject absolute paths
+if os.path.isabs(shared_env):
+    print(f"ERROR: shared_env must be relative, not absolute: {shared_env}", file=sys.stderr)
+    sys.exit(2)
+
+# Reject paths with ..
+if ".." in shared_env.split(os.sep):
+    print(f"ERROR: shared_env cannot contain '..': {shared_env}", file=sys.stderr)
+    sys.exit(2)
+
+main_service_dir = os.path.realpath(os.path.join(main_repo, service_path))
+worktree_service_dir = os.path.realpath(os.path.join(worktree_path, service_path))
+
+main_env_path = os.path.realpath(os.path.join(main_service_dir, shared_env))
+worktree_env_path = os.path.join(worktree_service_dir, shared_env)
+
+# Verify main_env_path stays within main_service_dir
+try:
+    if os.path.commonpath([main_env_path, main_service_dir]) != main_service_dir:
+        print(f"ERROR: shared_env escapes service directory: {shared_env}", file=sys.stderr)
+        sys.exit(2)
+except ValueError:
+    print(f"ERROR: shared_env path invalid: {shared_env}", file=sys.stderr)
+    sys.exit(2)
+
+print(f"{main_env_path}\t{worktree_env_path}")
+PY
+    ); then
+        error "Invalid shared_env for $service_name"
+        exit 1
+    fi
+
+    main_env_path=$(echo "$validated_paths" | cut -f1)
+    worktree_env_path=$(echo "$validated_paths" | cut -f2)
 
     if [ ! -f "$main_env_path" ]; then
         warn "shared_env not found in main worktree: $main_env_path"
