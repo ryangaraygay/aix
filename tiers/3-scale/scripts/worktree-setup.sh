@@ -258,6 +258,21 @@ fi
 WORKTREE_PATH="$WORKTREE_ROOT_ABS/$SANITIZED_NAME"
 BRANCH_NAME="${BRANCH_PREFIX}${SANITIZED_NAME}"
 
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+VALIDATE_SCRIPT="$SCRIPT_DIR/worktree-validate.sh"
+
+if [ -n "$CONFIG_PATH" ]; then
+    if [ -f "$VALIDATE_SCRIPT" ]; then
+        echo "Validating worktree config..."
+        if ! bash "$VALIDATE_SCRIPT" "$SANITIZED_NAME"; then
+            error "Worktree config validation failed"
+            exit 1
+        fi
+    else
+        warn "Worktree validate script not found: $VALIDATE_SCRIPT"
+    fi
+fi
+
 if [ -d "$WORKTREE_PATH" ]; then
     error "Directory already exists: $WORKTREE_PATH"
     exit 1
