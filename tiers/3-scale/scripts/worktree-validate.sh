@@ -95,7 +95,7 @@ if ! command -v python3 >/dev/null 2>&1; then
     exit 1
 fi
 
-if ! python3 - "$CONFIG_PATH" "$SCHEMA_PATH" "$REPO_ROOT" "$FEATURE_NAME" <<'PY'
+if python3 - "$CONFIG_PATH" "$SCHEMA_PATH" "$REPO_ROOT" "$FEATURE_NAME" <<'PY'
 import json
 import os
 import re
