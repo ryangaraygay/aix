@@ -93,9 +93,9 @@ import sys
 repo_root = sys.argv[1]
 path = sys.argv[2]
 if os.path.isabs(path):
-    resolved = os.path.abspath(path)
+    resolved = os.path.realpath(path)
 else:
-    resolved = os.path.abspath(os.path.join(repo_root, path))
+    resolved = os.path.realpath(os.path.join(repo_root, path))
 print(resolved)
 PY
 }
@@ -107,8 +107,8 @@ is_within_repo() {
 import os
 import sys
 
-path = os.path.abspath(sys.argv[1])
-repo_root = os.path.abspath(sys.argv[2])
+path = os.path.realpath(sys.argv[1])
+repo_root = os.path.realpath(sys.argv[2])
 try:
     common = os.path.commonpath([path, repo_root])
 except ValueError:
@@ -328,6 +328,7 @@ SERVICE_PATHS=()
 SERVICE_PORT_ENVS=()
 SERVICE_BASE_PORTS=()
 SERVICE_ENV_FILES=()
+SERVICE_SHARED_ENVS=()
 SERVICE_ENV_REFS=()
 
 SERVICES_TMP=$(mktemp)
@@ -355,6 +356,7 @@ for svc in services:
     port_env = svc.get("port_env")
     base_port = svc.get("base_port")
     env_file = svc.get("env_file") or ".env.local"
+    shared_env = svc.get("shared_env") or ""
     env_refs = svc.get("env_refs") or {}
 
     if not name or not path or not port_env or base_port is None:
@@ -366,8 +368,9 @@ for svc in services:
     if os.path.isabs(path):
         print(f"service path must be relative: {path}", file=sys.stderr)
         sys.exit(2)
-    resolved = os.path.abspath(os.path.join(repo_root, path))
-    if os.path.commonpath([resolved, repo_root]) != repo_root:
+    resolved = os.path.realpath(os.path.join(repo_root, path))
+    repo_real = os.path.realpath(repo_root)
+    if os.path.commonpath([resolved, repo_real]) != repo_real:
         print(f"service path escapes repo root: {path}", file=sys.stderr)
         sys.exit(2)
 
@@ -384,7 +387,7 @@ for svc in services:
         sys.exit(2)
 
     print(
-        f"{name}\t{path}\t{port_env}\t{base_port}\t{env_file}\t"
+        f"{name}\t{path}\t{port_env}\t{base_port}\t{env_file}\t{shared_env}\t"
         f"{json.dumps(env_refs, separators=(',', ':'))}"
     )
 PY
@@ -393,17 +396,32 @@ then
     exit 1
 fi
 
-while IFS=$'\t' read -r name path port_env base_port env_file env_refs; do
+while IFS=$'\t' read -r name path port_env base_port env_file shared_env env_refs; do
     SERVICE_NAMES+=("$name")
     SERVICE_PATHS+=("$path")
     SERVICE_PORT_ENVS+=("$port_env")
     SERVICE_BASE_PORTS+=("$base_port")
     SERVICE_ENV_FILES+=("$env_file")
+    SERVICE_SHARED_ENVS+=("$shared_env")
     SERVICE_ENV_REFS+=("$env_refs")
 done < "$SERVICES_TMP"
 
-declare -A SERVICE_PORTS
-declare -A PORT_SEEN
+# Calculate ports (bash 3.x compatible - no associative arrays)
+SERVICE_CALC_PORTS=()
+SEEN_PORTS=()
+SEEN_PORT_SERVICES=()
+
+get_port_for_service() {
+    local name="$1"
+    for i in "${!SERVICE_NAMES[@]}"; do
+        if [ "${SERVICE_NAMES[$i]}" = "$name" ]; then
+            echo "${SERVICE_CALC_PORTS[$i]}"
+            return 0
+        fi
+    done
+    return 1
+}
+
 for idx in "${!SERVICE_NAMES[@]}"; do
     base_port="${SERVICE_BASE_PORTS[$idx]}"
     port=$((base_port + PORT_OFFSET))
@@ -411,15 +429,25 @@ for idx in "${!SERVICE_NAMES[@]}"; do
         error "Port out of range for ${SERVICE_NAMES[$idx]}: $port"
         exit 1
     fi
-    if [ -n "${PORT_SEEN[$port]:-}" ]; then
-        error "Port collision detected: $port used by ${PORT_SEEN[$port]} and ${SERVICE_NAMES[$idx]}"
+    # Check for port collision (linear search)
+    collision=""
+    for i in "${!SEEN_PORTS[@]}"; do
+        if [ "${SEEN_PORTS[$i]}" = "$port" ]; then
+            collision="${SEEN_PORT_SERVICES[$i]}"
+            break
+        fi
+    done
+    if [ -n "$collision" ]; then
+        error "Port collision detected: $port used by $collision and ${SERVICE_NAMES[$idx]}"
         exit 1
     fi
-    PORT_SEEN["$port"]="${SERVICE_NAMES[$idx]}"
-    SERVICE_PORTS["${SERVICE_NAMES[$idx]}"]="$port"
+    SEEN_PORTS+=("$port")
+    SEEN_PORT_SERVICES+=("${SERVICE_NAMES[$idx]}")
+    SERVICE_CALC_PORTS+=("$port")
 done
 
-declare -A SERVICE_ENV_RELPATHS
+# Calculate env relpaths (bash 3.x compatible - indexed array)
+SERVICE_ENV_RELPATHS=()
 for idx in "${!SERVICE_NAMES[@]}"; do
     service_name="${SERVICE_NAMES[$idx]}"
     service_path="${SERVICE_PATHS[$idx]}"
@@ -450,12 +478,107 @@ PY
         error "Invalid env_file for $service_name"
         exit 1
     fi
-    SERVICE_ENV_RELPATHS["$service_name"]="$env_relpath"
+    SERVICE_ENV_RELPATHS+=("$env_relpath")
+done
+
+# Symlink shared_env files to main worktree
+for idx in "${!SERVICE_NAMES[@]}"; do
+    service_name="${SERVICE_NAMES[$idx]}"
+    service_path="${SERVICE_PATHS[$idx]}"
+    shared_env="${SERVICE_SHARED_ENVS[$idx]}"
+
+    if [ -z "$shared_env" ]; then
+        continue
+    fi
+
+    # Validate shared_env path (same security checks as env_file)
+    if ! validated_paths=$(python3 - "$MAIN_REPO" "$WORKTREE_PATH" "$service_path" "$shared_env" <<'PY'
+import os
+import sys
+
+main_repo = os.path.realpath(sys.argv[1])
+worktree_path = os.path.realpath(sys.argv[2])
+service_path = sys.argv[3]
+shared_env = sys.argv[4]
+
+# Reject absolute paths
+if os.path.isabs(shared_env):
+    print(f"ERROR: shared_env must be relative, not absolute: {shared_env}", file=sys.stderr)
+    sys.exit(2)
+
+# Reject paths with ..
+if ".." in shared_env.split(os.sep):
+    print(f"ERROR: shared_env cannot contain '..': {shared_env}", file=sys.stderr)
+    sys.exit(2)
+
+main_service_dir = os.path.realpath(os.path.join(main_repo, service_path))
+worktree_service_dir = os.path.realpath(os.path.join(worktree_path, service_path))
+
+main_env_path = os.path.realpath(os.path.join(main_service_dir, shared_env))
+worktree_env_path = os.path.join(worktree_service_dir, shared_env)
+
+# Verify main_env_path stays within main_service_dir
+try:
+    if os.path.commonpath([main_env_path, main_service_dir]) != main_service_dir:
+        print(f"ERROR: shared_env escapes service directory: {shared_env}", file=sys.stderr)
+        sys.exit(2)
+except ValueError:
+    print(f"ERROR: shared_env path invalid: {shared_env}", file=sys.stderr)
+    sys.exit(2)
+
+print(f"{main_env_path}\t{worktree_env_path}")
+PY
+    ); then
+        error "Invalid shared_env for $service_name"
+        exit 1
+    fi
+
+    main_env_path=$(echo "$validated_paths" | cut -f1)
+    worktree_env_path=$(echo "$validated_paths" | cut -f2)
+
+    if [ ! -f "$main_env_path" ]; then
+        warn "shared_env not found in main worktree: $main_env_path"
+        warn "  Create it with your secrets, then it will be symlinked to new worktrees"
+        continue
+    fi
+
+    if [ -e "$worktree_env_path" ] || [ -L "$worktree_env_path" ]; then
+        warn "shared_env already exists in worktree, skipping: $worktree_env_path"
+        continue
+    fi
+
+    mkdir -p "$(dirname "$worktree_env_path")"
+    ln -s "$main_env_path" "$worktree_env_path"
+    info "  Symlinked $service_path/$shared_env → main worktree"
 done
 
 SYMLINK_TMP=$(mktemp)
 register_temp "$SYMLINK_TMP"
-declare -A ENV_SEED_SOURCES
+# ENV_SEED tracking (bash 3.x compatible)
+ENV_SEED_KEYS=()
+ENV_SEED_VALUES=()
+
+get_env_seed_source() {
+    local key="$1"
+    for i in "${!ENV_SEED_KEYS[@]}"; do
+        if [ "${ENV_SEED_KEYS[$i]}" = "$key" ]; then
+            echo "${ENV_SEED_VALUES[$i]}"
+            return 0
+        fi
+    done
+    return 1
+}
+
+has_env_seed_source() {
+    local key="$1"
+    for i in "${!ENV_SEED_KEYS[@]}"; do
+        if [ "${ENV_SEED_KEYS[$i]}" = "$key" ]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
 if python3 - "$CONFIG_JSON" "$REPO_ROOT" >"$SYMLINK_TMP" <<'PY'
 import glob
 import json
@@ -550,11 +673,15 @@ then
     while IFS=$'\t' read -r source relpath mode; do
         [ -z "$source" ] && continue
         if [ "$mode" = "seed" ]; then
-            if [ -n "${ENV_SEED_SOURCES[$relpath]:-}" ] && [ "${ENV_SEED_SOURCES[$relpath]}" != "$source" ]; then
-                warn "Multiple env seed sources for $relpath; using first"
+            if has_env_seed_source "$relpath"; then
+                existing=$(get_env_seed_source "$relpath")
+                if [ "$existing" != "$source" ]; then
+                    warn "Multiple env seed sources for $relpath; using first"
+                fi
                 continue
             fi
-            ENV_SEED_SOURCES["$relpath"]="$source"
+            ENV_SEED_KEYS+=("$relpath")
+            ENV_SEED_VALUES+=("$source")
             continue
         fi
         dest="$WORKTREE_PATH/$relpath"
@@ -578,7 +705,7 @@ for idx in "${!SERVICE_NAMES[@]}"; do
     port_env="${SERVICE_PORT_ENVS[$idx]}"
     env_file="${SERVICE_ENV_FILES[$idx]}"
     env_refs_json="${SERVICE_ENV_REFS[$idx]}"
-    port="${SERVICE_PORTS[$service_name]}"
+    port="${SERVICE_CALC_PORTS[$idx]}"
 
     service_dir="$WORKTREE_PATH/$service_path"
     if [ ! -d "$service_dir" ]; then
@@ -601,8 +728,11 @@ for idx in "${!SERVICE_NAMES[@]}"; do
         continue
     fi
 
-    env_relpath="${SERVICE_ENV_RELPATHS[$service_name]:-}"
-    seed_source="${ENV_SEED_SOURCES[$env_relpath]:-}"
+    env_relpath="${SERVICE_ENV_RELPATHS[$idx]:-}"
+    seed_source=""
+    if has_env_seed_source "$env_relpath"; then
+        seed_source=$(get_env_seed_source "$env_relpath")
+    fi
     seed_content=""
     if [ -n "$seed_source" ]; then
         if [ -f "$seed_source" ]; then
@@ -626,9 +756,12 @@ for idx in "${!SERVICE_NAMES[@]}"; do
 
         if [ -n "$env_refs_json" ] && [ "$env_refs_json" != "null" ]; then
             while IFS=$'\t' read -r key value; do
-                for ref in "${!SERVICE_PORTS[@]}"; do
+                # Expand {{service.port}} placeholders
+                for ref_idx in "${!SERVICE_NAMES[@]}"; do
+                    ref="${SERVICE_NAMES[$ref_idx]}"
+                    ref_port="${SERVICE_CALC_PORTS[$ref_idx]}"
                     placeholder="{{${ref}.port}}"
-                    value="${value//${placeholder}/${SERVICE_PORTS[$ref]}}"
+                    value="${value//${placeholder}/${ref_port}}"
                 done
                 if [[ "$value" == *"{{"*"}}"* ]]; then
                     error "Unresolved env_refs for $service_name: $key"
@@ -649,6 +782,7 @@ PY
             )
         fi
     } > "$env_path"
+    chmod 600 "$env_path"
 done
 
 POST_SETUP=()

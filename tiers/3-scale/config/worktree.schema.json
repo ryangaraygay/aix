@@ -42,7 +42,12 @@
             "maximum": 65535
           },
           "env_file": {
-            "type": "string"
+            "type": "string",
+            "description": "Per-worktree env file (created with PORT offset)"
+          },
+          "shared_env": {
+            "type": "string",
+            "description": "Shared env file (symlinked to main worktree)"
           },
           "env_refs": {
             "type": "object",
