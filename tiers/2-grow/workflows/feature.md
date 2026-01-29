@@ -250,8 +250,9 @@ Execution loop:
 │  ├── Read assigned task from plan                           │
 │  ├── Implement that ONE task                                │
 │  ├── Write/update tests for that task                       │
-│  ├── Run tests locally                                      │
-│  └── Report completion                                      │
+│  ├── Run tests locally (MUST PASS before commit)            │
+│  │   └── If tests fail, fix before proceeding               │
+│  └── Commit changes (only after tests pass)                 │
 │                                                             │
 │  (orchestrator waits for all phase tasks to complete)       │
 │                                                             │
