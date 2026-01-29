@@ -52,7 +52,98 @@ Task from backlog
        └── Just capture? ──────────────────▶ create task card only
 ```
 
-## Implementation Loop
+## Task-Level Execution (Feature Workflow)
+
+> **Invoke coder once per task, not once for all tasks.** This minimizes context per invocation and enables parallel execution for `[P]` tasks.
+
+### Execution Model
+
+| Role | Granularity | Parallelism |
+|------|-------------|-------------|
+| Coder | Per task | Yes, for `[P]` tasks within a phase |
+| Reviewer | Per phase | No |
+| Tester | Once at end | No |
+
+### State Tracking
+
+#### Primary: Built-in Task Management (Claude Code)
+
+When `TaskCreate`/`TaskList`/`TaskUpdate` tools are available:
+
+```
+Setup:
+  TaskCreate for each task from plan (T001, T002, etc.)
+  TaskUpdate to set dependencies if needed (blockedBy/blocks)
+
+Per phase:
+  1. TaskList → find unblocked tasks in current phase
+  2. TaskUpdate → mark as in_progress
+  3. Spawn parallel coder Tasks for [P] items (single message, multiple Task calls)
+  4. TaskUpdate → mark completed as coders finish
+  5. When all phase tasks completed → invoke reviewer
+  6. If issues → spawn coder(s) to fix, re-review
+  7. Move to next phase
+
+After all phases:
+  → Invoke tester for full integration testing
+```
+
+#### Fallback: State-File Tracking
+
+When task management tools are unavailable:
+
+```
+Use .aix/state/task-progress.md for tracking (NOT plan files):
+  - Create: .aix/state/task-progress.md
+  - Track: "Completed: T001, T002" and "Current Phase: 1"
+  - Read plan for task definitions, state file for progress
+  - Update state file after coder completion
+```
+
+> **Note:** Never edit plan file checkboxes for progress tracking. Plans document decisions, not progress.
+
+### Example: Phase Execution
+
+```
+Phase 1 tasks: T001[P], T002[P], T003, T004[P]
+
+Step 1 - Parallel coders for [P] tasks:
+  Task: "Implement T001 (types.ts)" - subagent_type: coder
+  Task: "Implement T002 (constants.ts)" - subagent_type: coder
+  Task: "Implement T004 (utils.ts)" - subagent_type: coder
+  (send all three in single message)
+
+Step 2 - Sequential coder for dependent task:
+  Task: "Implement T003 (depends on T001)" - subagent_type: coder
+
+Step 3 - Phase review:
+  Task: "Review Phase 1 changes (T001-T004)" - subagent_type: reviewer
+
+Step 4 - If issues, fix and re-review:
+  Task: "Fix H-001 in types.ts" - subagent_type: coder
+  Task: "Re-review Phase 1" - subagent_type: reviewer
+
+Step 5 - Move to Phase 2...
+```
+
+### Coder Prompt Template (Single Task)
+
+```
+Implement task T001 from the plan at `.aix/plans/feature/plan.md`.
+
+Task: [task description from plan]
+- [subtask 1]
+- [subtask 2]
+
+This is ONE task. Do NOT implement other tasks.
+Other tasks run in parallel or will be handled in subsequent invocations.
+
+Report completion status when done.
+```
+
+## Implementation Loop (Quick-Fix)
+
+For quick-fixes without phases, use the traditional per-iteration model:
 
 The coder-reviewer-tester cycle:
 

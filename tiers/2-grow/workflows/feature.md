@@ -144,38 +144,139 @@ Create: `.aix/plans/{feature}/plan.md`
 **Roles**: coder, reviewer, tester
 **Purpose**: Implement, review, and test until quality bar met
 
-### Loop Execution
+### Task-Level Execution Model
+
+> **Invoke coder once per task, not once for all tasks.** This minimizes context per invocation and enables parallel execution.
+
+| Role | Granularity | Parallelism |
+|------|-------------|-------------|
+| Coder | Per task | Yes, for `[P]` tasks within a phase |
+| Reviewer | Per phase | No (sequential phases) |
+| Tester | Once at end | No |
+
+**Execution flow for each phase:**
+
+```
+Phase N tasks from plan (e.g., T001[P], T002[P], T003, T004[P])
+       │
+       ├── Parallel: Spawn CODER for T001, T002, T004 (marked [P])
+       │             └── Each coder implements ONE task
+       │
+       ├── Sequential: After T001/T002 complete, CODER for T003 (if dependent)
+       │
+       └── When all phase tasks complete:
+           └── REVIEWER reviews entire phase
+           └── If issues: spawn coder(s) to fix, then re-review phase
+           └── Move to next phase
+
+After all phases complete:
+  └── TESTER runs full integration/e2e tests
+```
+
+**Example prompt to coder (single task):**
+
+```
+Implement task T001 from the plan at `.aix/plans/feature-name/plan.md`.
+
+Task: Create types.ts
+- Define Event interface
+- Define TimeSlot type
+- Export all types
+
+This is ONE task. Do NOT implement other tasks.
+Report completion status when done.
+```
+
+### Orchestration State Management
+
+#### Primary: Built-in Task Management (Claude Code)
+
+When `TaskCreate`/`TaskList`/`TaskUpdate` tools are available:
+
+```
+Setup phase:
+  TaskCreate for each task from plan (T001, T002, etc.)
+  TaskUpdate to set dependencies (blockedBy/blocks)
+
+Execution loop:
+  TaskList → identify unblocked tasks in current phase
+  TaskUpdate → mark tasks as in_progress
+  Spawn parallel coder Tasks for [P] items
+  TaskUpdate → mark completed as coders finish
+
+  When all phase tasks completed → invoke reviewer
+  If reviewer finds issues → spawn coder to fix, re-review
+
+  Move to next phase, repeat
+
+  When all phases completed → invoke tester
+```
+
+#### Fallback: State-File Tracking (Generic)
+
+When task management tools are unavailable:
+
+```
+Use .aix/state/task-progress.md for tracking (NOT plan files):
+  - Create: .aix/state/task-progress.md
+  - Track completed tasks: "Completed: T001, T002"
+  - Track current phase: "Current Phase: 2"
+  - Read plan for task definitions, state file for progress
+
+Execution loop:
+  Read plan → identify tasks in current phase
+  Read state file → identify completed tasks
+  Spawn parallel coder Tasks for incomplete [P] items
+  Update state file with completed tasks
+
+  When all phase tasks completed → invoke reviewer
+  If reviewer finds issues → spawn coder to fix, re-review
+
+  Move to next phase, repeat
+
+  When all phases complete → invoke tester
+```
+
+> **Note:** Never edit plan file checkboxes for progress tracking. Plans document decisions, not progress.
+
+### Loop Execution (Per Phase)
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    ITERATION N                               │
+│                    PHASE N ITERATION                         │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
-│  CODER                                                      │
-│  ├── Read spec and acceptance criteria                      │
-│  ├── Implement changes (or fix feedback from prior loop)    │
-│  ├── Write/update tests                                     │
+│  CODER(s) - one per task, parallel for [P] tasks            │
+│  ├── Read assigned task from plan                           │
+│  ├── Implement that ONE task                                │
+│  ├── Write/update tests for that task                       │
 │  ├── Run tests locally                                      │
-│  └── Commit changes                                         │
+│  └── Report completion                                      │
 │                                                             │
-│  REVIEWER                                                   │
+│  (orchestrator waits for all phase tasks to complete)       │
+│                                                             │
+│  REVIEWER - once per phase                                  │
+│  ├── Review all completed tasks in phase together           │
 │  ├── Check spec compliance                                  │
 │  ├── Check code quality                                     │
 │  ├── Classify findings by severity                          │
 │  └── Output: APPROVED or CHANGES_REQUESTED                  │
 │                                                             │
-│  TESTER                                                     │
-│  ├── Run automated tests                                    │
-│  ├── Verify acceptance criteria manually                    │
-│  ├── Test edge cases                                        │
-│  ├── Classify findings by severity                          │
+│  If CHANGES_REQUESTED:                                      │
+│  └── Spawn coder(s) to fix specific issues                  │
+│  └── Re-review phase                                        │
+│                                                             │
+│  When phase approved → move to next phase                   │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+
+After all phases complete:
+┌─────────────────────────────────────────────────────────────┐
+│  TESTER - once at end                                       │
+│  ├── Run full automated test suite                          │
+│  ├── Verify acceptance criteria                             │
+│  ├── Test integration between phases                        │
 │  └── Output: PASS or BUGS_FOUND                             │
-│                                                             │
-│  LOOP CONTROLLER                                            │
-│  ├── Aggregate findings                                     │
-│  ├── Check exit conditions                                  │
-│  └── Decision: EXIT / LOOP / ESCALATE                       │
-│                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -382,14 +483,29 @@ START
   │ Yes
   ▼
 ┌─────────────────────────────────────────┐
-│         IMPLEMENTATION LOOP             │
+│     IMPLEMENTATION (Phase-by-Phase)     │
 │                                         │
-│  ┌────────┐  ┌──────────┐  ┌────────┐   │
-│  │ CODER  │─▶│ REVIEWER │─▶│ TESTER │   │
-│  └────────┘  └──────────┘  └────────┘   │
-│       ▲                         │       │
-│       └─────────────────────────┘       │
-│         (if issues found)               │
+│  For each phase:                        │
+│  ┌────────┐ ┌────────┐ ┌────────┐       │
+│  │CODER(1)│ │CODER(2)│ │CODER(n)│ [P]   │
+│  └────┬───┘ └────┬───┘ └────┬───┘       │
+│       └──────────┼──────────┘           │
+│                  ▼                      │
+│           ┌──────────┐                  │
+│           │ REVIEWER │ (per phase)      │
+│           └──────────┘                  │
+│                  │                      │
+│       ┌──────────┴──────────┐           │
+│       │ issues?             │           │
+│       ▼                     ▼           │
+│   fix & re-review     next phase        │
+│                                         │
+│  After all phases:                      │
+│           ┌────────┐                    │
+│           │ TESTER │ (once at end)      │
+│           └────────┘                    │
+│                                         │
+│  Exit: clean or escalate                │
 └─────────────────────────────────────────┘
   │
   ▼
