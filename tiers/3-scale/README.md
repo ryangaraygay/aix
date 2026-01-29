@@ -26,6 +26,14 @@ Additions for complex projects with parallel development and long-running AI ses
 |--------|---------|
 | [worktree-setup.sh](scripts/worktree-setup.sh) | Create isolated worktree for parallel development |
 | [worktree-cleanup.sh](scripts/worktree-cleanup.sh) | Remove worktree and clean up branches |
+| [worktree-validate.sh](scripts/worktree-validate.sh) | Validate worktree config and port allocation |
+
+### Config
+
+| Config | Purpose |
+|--------|---------|
+| [worktree.schema.json](config/worktree.schema.json) | Schema for worktree.yaml validation |
+| [worktree.yaml](config/worktree.yaml) | Worktree config template |
 
 ### Hooks
 
@@ -45,6 +53,7 @@ Additions for complex projects with parallel development and long-running AI ses
 | [cognitive-audit](skills/cognitive-audit/) | Cognitive load, Miller's Law, jargon analysis |
 | [delight-audit](skills/delight-audit/) | Brand voice, empty states, micro-interactions |
 | [resilience-audit](skills/resilience-audit/) | Offline capability, state recovery, graceful degradation |
+| [worktree-init](skills/worktree-init/) | Generate project-specific worktree config |
 
 ### Strategy Docs
 
@@ -61,10 +70,18 @@ After upgrade, files are added to your project:
 # Files added to .aix/scripts/
 worktree-setup.sh
 worktree-cleanup.sh
+worktree-validate.sh
 
 # Files added to .aix/hooks/
 pre-compact.sh
 post-compact.sh
+
+# Files added to .aix/config/
+worktree.schema.json
+worktree.yaml
+
+# Files added to .aix/skills/
+worktree-init/
 
 # Templates added to docs/
 roadmap.md
@@ -84,6 +101,12 @@ Worktrees allow parallel development without branch switching.
 # Creates:
 #   ../my-feature/     (worktree directory)
 #   feat/my-feature    (new branch from origin/dev)
+```
+
+### Validate configuration
+
+```bash
+./.aix/scripts/worktree-validate.sh my-feature
 ```
 
 ### Work in the worktree

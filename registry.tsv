@@ -32,3 +32,7 @@ product-designer	3	role	roles/product-designer.md	Product designer role
 validate-bash	3	hook	hooks/validate-bash.sh	Validate bash hook
 worktree-setup	3	script	scripts/worktree-setup.sh	Worktree setup script
 worktree-cleanup	3	script	scripts/worktree-cleanup.sh	Worktree cleanup script
+worktree-validate	3	script	scripts/worktree-validate.sh	Worktree validation script
+worktree-schema	3	config	config/worktree.schema.json	Worktree config schema
+worktree-template	3	config	config/worktree.yaml	Worktree config template
+worktree-init	3	skill	skills/worktree-init	Worktree init skill
