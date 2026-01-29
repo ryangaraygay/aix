@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=worktree.schema.json
+
+# Optional: package manager override (pnpm|npm|yarn|bun|none)
+# package_manager: pnpm
+
+# Optional: worktree root (absolute or relative to repo root)
+# worktree_root: ..
+
+# Optional: branch prefix (default: feat/)
+# branch_prefix: feat/
+
+services:
+  - name: web
+    path: apps/web
+    port_env: PORT
+    base_port: 3000
+    env_file: .env.local
+    env_refs:
+      API_URL: "http://localhost:{{api.port}}"
+
+symlinks:
+  - .aix/env/*.env
+
+post_setup: []
+pre_cleanup: []
