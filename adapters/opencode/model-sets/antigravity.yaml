@@ -1,0 +1,14 @@
+name: antigravity
+description: Gemini 3 + Claude via Antigravity plugin
+default: true
+
+roles:
+  orchestrator: google/antigravity-claude-opus-4-5-thinking-low
+  analyst: google/antigravity-gemini-3-pro-high
+  coder: google/antigravity-claude-opus-4-5-thinking-low
+  reviewer: google/antigravity-claude-opus-4-5-thinking-high
+  debug: google/antigravity-claude-opus-4-5-thinking-high
+  product-designer: google/antigravity-gemini-3-pro-high
+  tester: google/antigravity-gemini-3-flash
+  docs: google/antigravity-gemini-3-flash
+  triage: google/antigravity-gemini-3-flash

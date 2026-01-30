@@ -1,0 +1,18 @@
+name: balanced
+description: Quality with cost balance
+default: true
+
+roles:
+  orchestrator: claude-opus-4-5-20251101
+  analyst: claude-opus-4-5-20251101
+  coder: claude-opus-4-5-20251101
+  reviewer:
+    model: gpt-5.2-codex
+    reasoningEffort: high
+  debug:
+    model: gpt-5.2-codex
+    reasoningEffort: high
+  product-designer: gemini-3-pro-preview
+  tester: gpt-5.2-codex
+  docs: claude-sonnet-4-5-20250929
+  triage: gpt-5.2-codex

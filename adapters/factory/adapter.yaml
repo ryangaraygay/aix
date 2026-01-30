@@ -1,0 +1,26 @@
+adapter: factory
+version: 1
+
+output:
+  droids: .factory/droids
+  skills: .factory/skills
+
+skills:
+  strategy: symlink
+
+model_sets:
+  enabled: true
+  default: balanced
+
+roles:
+  format: markdown
+  filename: "{name}.md"
+
+# Factory tool names (Write->Create, Bash->Execute)
+tools:
+  Read: Read
+  Write: Create
+  Edit: Edit
+  Bash: Execute
+  Grep: Grep
+  Glob: Glob

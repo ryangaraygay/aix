@@ -1,0 +1,17 @@
+name: optimal
+description: Speed + quality guards - xhigh analyst, Opus reviewer
+
+roles:
+  orchestrator: claude-opus-4-5-20251101
+  analyst:
+    model: gpt-5.2-codex
+    reasoningEffort: xhigh
+  coder: custom:Cerebras:-zai-glm-4.7-0
+  reviewer: claude-opus-4-5-20251101
+  debug:
+    model: gpt-5.2-codex
+    reasoningEffort: high
+  product-designer: gemini-3-pro-preview
+  tester: custom:Cerebras:-zai-glm-4.7-0
+  docs: custom:Cerebras:-gpt-oss-120b-1
+  triage: gemini-3-flash-preview

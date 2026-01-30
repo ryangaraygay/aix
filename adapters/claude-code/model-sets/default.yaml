@@ -1,0 +1,14 @@
+name: default
+description: Standard Claude models
+default: true
+
+roles:
+  orchestrator: opus
+  analyst: opus
+  coder: sonnet
+  reviewer: opus
+  debug: opus
+  product-designer: opus
+  tester: sonnet
+  docs: sonnet
+  triage: haiku
