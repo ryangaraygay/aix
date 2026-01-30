@@ -1,0 +1,25 @@
+adapter: claude
+version: 1
+
+output:
+  agents: .claude/agents
+  skills: .claude/skills
+
+skills:
+  strategy: symlink
+
+model_sets:
+  enabled: true
+  default: default
+
+roles:
+  format: markdown
+  filename: "{name}.md"
+
+tools:
+  Read: Read
+  Write: Write
+  Edit: Edit
+  Bash: Bash
+  Grep: Grep
+  Glob: Glob

@@ -1,0 +1,19 @@
+name: speed
+description: Fast iteration - quality upfront, Cerebras execution
+
+roles:
+  orchestrator:
+    model: gpt-5.2-codex
+    reasoningEffort: high
+  analyst:
+    model: gpt-5.2-codex
+    reasoningEffort: xhigh
+  coder: custom:Cerebras:-zai-glm-4.7-0
+  reviewer: custom:Cerebras:-zai-glm-4.7-0
+  debug:
+    model: gpt-5.2-codex
+    reasoningEffort: high
+  product-designer: gemini-3-pro-preview
+  tester: custom:Cerebras:-zai-glm-4.7-0
+  docs: custom:Cerebras:-gpt-oss-120b-1
+  triage: custom:Cerebras:-zai-glm-4.7-0
