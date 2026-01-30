@@ -219,10 +219,26 @@ if [ -f "$REPO_ROOT/.aix/scripts/aix-generate.py" ]; then
     python3 "$REPO_ROOT/.aix/scripts/aix-generate.py" --adapter "$SELECTED_ADAPTER" 2>/dev/null || true
 fi
 
-# Legacy: Run Claude Code adapter script for symlinks if claude selected
-if [ "$SELECTED_ADAPTER" = "claude" ] && [ -f "$AIX_FRAMEWORK/adapters/claude-code/generate.sh" ]; then
-    "$AIX_FRAMEWORK/adapters/claude-code/generate.sh" 0
-fi
+# Create entry point symlink based on adapter
+case "$SELECTED_ADAPTER" in
+    claude)
+        # Legacy: Run Claude Code adapter script for symlinks
+        if [ -f "$AIX_FRAMEWORK/adapters/claude-code/generate.sh" ]; then
+            "$AIX_FRAMEWORK/adapters/claude-code/generate.sh" 0
+        fi
+        ;;
+    opencode)
+        ln -sf .aix/constitution.md "$REPO_ROOT/AGENTS.md"
+        echo "✓ Created AGENTS.md -> .aix/constitution.md"
+        ;;
+    factory)
+        ln -sf .aix/constitution.md "$REPO_ROOT/GEMINI.md"
+        echo "✓ Created GEMINI.md -> .aix/constitution.md"
+        ;;
+    agentskills)
+        # No entry point needed for agent skills
+        ;;
+esac
 
 # Create .gitignore additions
 if [ -f "$REPO_ROOT/.gitignore" ]; then
