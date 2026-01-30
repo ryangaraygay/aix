@@ -178,8 +178,9 @@ select_adapter() {
 SELECTED_ADAPTER=$(select_adapter)
 echo "Selected adapter: $SELECTED_ADAPTER"
 
-# Create tier.yaml with adapter config
-cat > "$REPO_ROOT/.aix/tier.yaml" << EOF
+# Create tier.yaml with adapter config (model_set added after we read adapter.yaml)
+create_tier_yaml() {
+    cat > "$REPO_ROOT/.aix/tier.yaml" << EOF
 tier: 0
 name: seed
 aix_version: $AIX_VERSION
@@ -192,10 +193,14 @@ history:
 adapters:
   $SELECTED_ADAPTER:
     enabled: true
-    model_set: default
 EOF
+    # Add model_set only if adapter has one
+    if [ -n "$DEFAULT_MODEL_SET" ]; then
+        echo "    model_set: $DEFAULT_MODEL_SET" >> "$REPO_ROOT/.aix/tier.yaml"
+    fi
+}
 
-# Copy adapter config
+# Copy adapter config and determine default model set
 echo "Setting up $SELECTED_ADAPTER adapter..."
 ADAPTER_DIR=""
 case "$SELECTED_ADAPTER" in
@@ -205,13 +210,21 @@ case "$SELECTED_ADAPTER" in
     agentskills) ADAPTER_DIR="agentskills" ;;
 esac
 
+DEFAULT_MODEL_SET=""
 if [ -d "$AIX_FRAMEWORK/adapters/$ADAPTER_DIR" ]; then
     mkdir -p "$REPO_ROOT/.aix/adapters/$SELECTED_ADAPTER"
     cp "$AIX_FRAMEWORK/adapters/$ADAPTER_DIR/adapter.yaml" "$REPO_ROOT/.aix/adapters/$SELECTED_ADAPTER/"
     if [ -d "$AIX_FRAMEWORK/adapters/$ADAPTER_DIR/model-sets" ]; then
         cp -r "$AIX_FRAMEWORK/adapters/$ADAPTER_DIR/model-sets" "$REPO_ROOT/.aix/adapters/$SELECTED_ADAPTER/"
     fi
+    # Extract default model set from adapter.yaml
+    if [ -f "$AIX_FRAMEWORK/adapters/$ADAPTER_DIR/adapter.yaml" ]; then
+        DEFAULT_MODEL_SET=$(grep -A1 "model_sets:" "$AIX_FRAMEWORK/adapters/$ADAPTER_DIR/adapter.yaml" | grep "default:" | sed 's/.*default: *//' | tr -d ' ')
+    fi
 fi
+
+# Now create tier.yaml with the correct model_set
+create_tier_yaml
 
 # Generate adapter output using aix-generate.py
 if [ -f "$REPO_ROOT/.aix/scripts/aix-generate.py" ]; then
