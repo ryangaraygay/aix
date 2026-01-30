@@ -21,6 +21,26 @@ echo "Bootstrapping aix in: $REPO_ROOT"
 echo "Using framework from: $AIX_FRAMEWORK"
 echo ""
 
+# Parse command line arguments
+ADAPTER="${ADAPTER:-}"
+SKIP_PROMPT="${SKIP_PROMPT:-false}"
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --adapter)
+            ADAPTER="$2"
+            shift 2
+            ;;
+        --skip-prompt)
+            SKIP_PROMPT=true
+            shift
+            ;;
+        *)
+            shift
+            ;;
+    esac
+done
+
 # Check if already initialized
 if [ -d "$REPO_ROOT/.aix" ]; then
     echo "aix already initialized. Run /aix-init upgrade to upgrade."
@@ -126,7 +146,39 @@ if [ -f "$MANIFEST_TOOL" ]; then
         --aix-version "$AIX_VERSION"
 fi
 
-# Create tier.yaml
+# Select coding assistant adapter
+select_adapter() {
+    if [ -n "$ADAPTER" ]; then
+        echo "$ADAPTER"
+        return
+    fi
+
+    if [ "$SKIP_PROMPT" = true ]; then
+        echo "claude"
+        return
+    fi
+
+    echo ""
+    echo "Select your coding assistant:"
+    echo "  1) Claude Code (recommended)"
+    echo "  2) OpenCode"
+    echo "  3) Factory/Droid"
+    echo "  4) Agent Skills (MCP-based tools)"
+    echo ""
+    read -p "Enter choice [1]: " choice
+
+    case "$choice" in
+        2) echo "opencode" ;;
+        3) echo "factory" ;;
+        4) echo "agentskills" ;;
+        *) echo "claude" ;;
+    esac
+}
+
+SELECTED_ADAPTER=$(select_adapter)
+echo "Selected adapter: $SELECTED_ADAPTER"
+
+# Create tier.yaml with adapter config
 cat > "$REPO_ROOT/.aix/tier.yaml" << EOF
 tier: 0
 name: seed
@@ -136,11 +188,41 @@ history:
   - tier: 0
     date: $(date -I)
     reason: initial bootstrap
+
+adapters:
+  $SELECTED_ADAPTER:
+    enabled: true
+    model_set: default
 EOF
 
-# Run Claude Code adapter
-echo "Setting up Claude Code integration..."
-"$AIX_FRAMEWORK/adapters/claude-code/generate.sh" 0
+# Copy adapter config
+echo "Setting up $SELECTED_ADAPTER adapter..."
+ADAPTER_DIR=""
+case "$SELECTED_ADAPTER" in
+    claude) ADAPTER_DIR="claude-code" ;;
+    opencode) ADAPTER_DIR="opencode" ;;
+    factory) ADAPTER_DIR="factory" ;;
+    agentskills) ADAPTER_DIR="agentskills" ;;
+esac
+
+if [ -d "$AIX_FRAMEWORK/adapters/$ADAPTER_DIR" ]; then
+    mkdir -p "$REPO_ROOT/.aix/adapters/$SELECTED_ADAPTER"
+    cp "$AIX_FRAMEWORK/adapters/$ADAPTER_DIR/adapter.yaml" "$REPO_ROOT/.aix/adapters/$SELECTED_ADAPTER/"
+    if [ -d "$AIX_FRAMEWORK/adapters/$ADAPTER_DIR/model-sets" ]; then
+        cp -r "$AIX_FRAMEWORK/adapters/$ADAPTER_DIR/model-sets" "$REPO_ROOT/.aix/adapters/$SELECTED_ADAPTER/"
+    fi
+fi
+
+# Generate adapter output using aix-generate.py
+if [ -f "$REPO_ROOT/.aix/scripts/aix-generate.py" ]; then
+    echo "Generating adapter configurations..."
+    python3 "$REPO_ROOT/.aix/scripts/aix-generate.py" --adapter "$SELECTED_ADAPTER" 2>/dev/null || true
+fi
+
+# Legacy: Run Claude Code adapter script for symlinks if claude selected
+if [ "$SELECTED_ADAPTER" = "claude" ] && [ -f "$AIX_FRAMEWORK/adapters/claude-code/generate.sh" ]; then
+    "$AIX_FRAMEWORK/adapters/claude-code/generate.sh" 0
+fi
 
 # Create .gitignore additions
 if [ -f "$REPO_ROOT/.gitignore" ]; then
@@ -170,13 +252,36 @@ echo "  ├── config.yaml"
 echo "  ├── tier.yaml"
 echo "  ├── roles/ (analyst, coder, reviewer)"
 echo "  ├── workflows/ (standard)"
-echo "  └── skills/ (aix-init, aix-sync)"
+echo "  ├── skills/ (aix-init, aix-sync)"
+echo "  └── adapters/$SELECTED_ADAPTER/"
 echo ""
-echo "  .claude/"
-echo "  ├── agents -> .aix/roles"
-echo "  └── skills -> .aix/skills"
-echo ""
-echo "  CLAUDE.md -> .aix/constitution.md"
+
+case "$SELECTED_ADAPTER" in
+    claude)
+        echo "  .claude/"
+        echo "  ├── agents/"
+        echo "  └── skills/"
+        echo ""
+        echo "  CLAUDE.md -> .aix/constitution.md"
+        ;;
+    opencode)
+        echo "  .opencode/"
+        echo "  ├── agent/"
+        echo "  └── skills/"
+        echo ""
+        echo "  AGENTS.md -> .aix/constitution.md"
+        ;;
+    factory)
+        echo "  .factory/"
+        echo "  ├── droids/"
+        echo "  └── skills/"
+        ;;
+    agentskills)
+        echo "  .agent/"
+        echo "  └── skills/"
+        ;;
+esac
+
 echo ""
 echo "  docs/"
 echo "  ├── product.md   <- Fill this in!"
@@ -186,6 +291,7 @@ echo ""
 echo "Next steps:"
 echo "  1. Fill in docs/product.md with your vision"
 echo "  2. Review docs/tech-stack.md"
-echo "  3. Open Claude Code and start building!"
+echo "  3. Open your coding assistant and start building!"
 echo ""
 echo "Run /aix-init upgrade when ready for more structure."
+echo "Run /aix-init --add-adapter <name> to add another adapter."

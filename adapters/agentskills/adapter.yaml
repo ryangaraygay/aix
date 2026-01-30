@@ -1,0 +1,15 @@
+adapter: agentskills
+version: 1
+
+output:
+  skills: .agent/skills
+
+skills:
+  strategy: symlink
+
+# No model sets - skills only adapter
+model_sets:
+  enabled: false
+
+roles:
+  enabled: false
