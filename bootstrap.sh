@@ -219,7 +219,7 @@ if [ -d "$AIX_FRAMEWORK/adapters/$ADAPTER_DIR" ]; then
     fi
     # Extract default model set from adapter.yaml
     if [ -f "$AIX_FRAMEWORK/adapters/$ADAPTER_DIR/adapter.yaml" ]; then
-        DEFAULT_MODEL_SET=$(grep -A1 "model_sets:" "$AIX_FRAMEWORK/adapters/$ADAPTER_DIR/adapter.yaml" | grep "default:" | sed 's/.*default: *//' | tr -d ' ')
+        DEFAULT_MODEL_SET=$(grep -A2 "model_sets:" "$AIX_FRAMEWORK/adapters/$ADAPTER_DIR/adapter.yaml" | grep "default:" | sed 's/.*default: *//' | tr -d ' ')
     fi
 fi
 
