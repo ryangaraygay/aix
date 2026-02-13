@@ -19,9 +19,9 @@ roles:
 
 # Kiro-native tool names
 tools:
-  Read: fs_read
-  Write: fs_write
-  Edit: fs_write
-  Bash: execute_bash
+  Read: read
+  Write: write
+  Edit: write
+  Bash: shell
   Grep: grep
   Glob: glob

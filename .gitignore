@@ -12,6 +12,11 @@ Thumbs.db
 *.swp
 *.swo
 
+# Python
+*.pyc
+__pycache__/
+.coverage
+
 # Environment
 .env
 .env.local

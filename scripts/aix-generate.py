@@ -343,7 +343,7 @@ def generate_json_agent(
         "mcpServers": {},
         "tools": mapped_tools,
         "toolAliases": {},
-        "allowedTools": [],
+        "allowedTools": mapped_tools,
         "resources": [],
         "hooks": {},
         "toolsSettings": {},
