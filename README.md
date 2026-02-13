@@ -24,12 +24,24 @@ The **constitution + workflow + role** trinity with **approval gates** and **pro
 
 ## What Makes aix Special
 
-- Agents/roles, skills, and hooks are first-class; there are richer collections elsewhere, and aix is designed to integrate them, not replace them.
+- **Multi-tool**: First-class support for Claude Code, Kiro CLI, OpenCode, Factory, and Agent Skills — same methodology, any tool.
+- **Adapter system**: Roles, skills, and constitution translate automatically to each tool's native format.
+- **Model sets**: Configure which models power each role — swap between budget, mid, and pro tiers per adapter.
 - Compaction-aware by default: hooks persist/restore context for Claude Code sessions.
-- Constitution + workflows are familiar; the difference is the combination with roles/skills/hooks and how they are enforced together.
 - Progressive enforcement: start minimal, grow as the project matures, or simplify later.
 - Safe evolution: adopt improvements from newer AIX versions without overwriting local customizations.
-- Primary support is Claude Code; other tool integrations (symlinks for constitutions/skills) are possible but not the current focus.
+
+---
+
+## Supported Adapters
+
+| Adapter | Tool | Constitution | Roles | Skills | Model Sets |
+|---------|------|-------------|-------|--------|------------|
+| **claude-code** | Claude Code | `CLAUDE.md` symlink | `.claude/agents/` (markdown) | `.claude/skills/` symlink | default |
+| **kiro-cli** | Kiro CLI | `AGENTS.md` symlink | `.kiro/agents/` (JSON) | `.kiro/skills/` symlink | budget, mid, pro |
+| **opencode** | OpenCode | `AGENTS.md` symlink | `.opencode/agent/` (markdown) | `.opencode/skills/` symlink | antigravity |
+| **factory** | Factory/Droid | `GEMINI.md` symlink | `.factory/droids/` (markdown) | `.factory/skills/` symlink | balanced, optimal, speed |
+| **agentskills** | MCP-based tools | — | — | `.agent/skills/` symlink | — |
 
 ---
 
@@ -54,11 +66,11 @@ aix grows with your project:
 # Create your project directory
 mkdir my-project && cd my-project
 
-# Bootstrap aix (run from your project directory)
+# Bootstrap aix (select your coding assistant)
 ~/tools/aix/bootstrap.sh
 
-# Open Claude Code
-claude
+# Or specify adapter directly
+ADAPTER=kiro ~/tools/aix/bootstrap.sh
 ```
 
 ### Existing Project
@@ -66,6 +78,13 @@ claude
 ```bash
 cd my-existing-project
 ~/tools/aix/bootstrap.sh
+```
+
+### With a Model Set
+
+```bash
+# Generate roles with a specific model set
+python3 .aix/scripts/aix-generate.py --adapter kiro --model-set pro
 ```
 
 ### Upgrading
@@ -79,7 +98,7 @@ The init skill will:
 1. Detect your tech stack (or ask)
 2. Generate appropriate tier structure
 3. Create input document templates
-4. Set up Claude Code integration
+4. Set up your chosen adapter's integration
 
 ---
 
@@ -88,19 +107,15 @@ The init skill will:
 **Most projects:** Bootstrap copies files into your project (simple, self-contained)
 
 ```bash
-# Current (while private)
-git clone git@github.com:ebblyn/aix.git ~/tools/aix
+git clone git@github.com:ryangaraygay/aix.git ~/tools/aix
 cd my-project
 ~/tools/aix/bootstrap.sh
-
-# Future (when public)
-curl -fsSL https://aix.dev/install | bash
 ```
 
 **AIX contributors:** Submodule for tight coupling
 
 ```bash
-git submodule add git@github.com:ebblyn/aix.git .aix
+git submodule add git@github.com:ryangaraygay/aix.git .aix
 ./.aix/adapters/claude-code/generate.sh 0
 ```
 
@@ -122,25 +137,31 @@ Every project needs these (templates provided):
 
 ## Directory Structure
 
-After `/aix-init`, your project will have:
+After bootstrap, your project will have:
 
 ```
 your-project/
-├── CLAUDE.md              # → .aix/constitution.md
-├── .claude/
-│   ├── agents/            # → .aix/roles/
-│   └── skills/            # → .aix/skills/
-├── .aix/
-│   ├── constitution.md    # Principles
-│   ├── config.yaml        # Settings
-│   ├── tier.yaml          # Current tier + history
-│   ├── workflows/         # How work flows
-│   ├── roles/             # Who does what
-│   └── skills/            # Reusable automation
+├── .aix/                     # Core framework (adapter-agnostic)
+│   ├── constitution.md       # Principles
+│   ├── config.yaml           # Settings
+│   ├── tier.yaml             # Current tier + adapter config
+│   ├── workflows/            # How work flows
+│   ├── roles/                # Who does what (canonical)
+│   ├── skills/               # Reusable automation
+│   └── adapters/             # Adapter configs + model sets
 └── docs/
     ├── product.md
     ├── tech-stack.md
     └── design.md
+```
+
+Plus adapter-specific output (examples):
+
+```
+# Claude Code                  # Kiro CLI
+CLAUDE.md → constitution        AGENTS.md → constitution
+.claude/agents/ → roles         .kiro/agents/*.json (generated)
+.claude/skills/ → skills        .kiro/skills/ → skills
 ```
 
 ---
