@@ -272,6 +272,87 @@ def generate_output_file(
     return output
 
 
+def replace_tool_names_in_body(body: str, adapter_config: Dict[str, Any]) -> str:
+    """
+    Replace canonical AIX tool names with adapter-specific names in body text.
+
+    Replaces backtick-wrapped tool references (e.g., `Read` -> `fs_read`).
+
+    Args:
+        body: Role body content
+        adapter_config: Adapter configuration dict
+
+    Returns:
+        Body with tool names replaced
+    """
+    tool_mapping = adapter_config.get("tools", {})
+    for canonical, native in tool_mapping.items():
+        if canonical != native:
+            body = body.replace(f"`{canonical}`", f"`{native}`")
+    return body
+
+
+def generate_json_agent(
+    role_name: str,
+    frontmatter: Dict[str, Any],
+    body: str,
+    adapter_config: Dict[str, Any],
+    model_config: Dict[str, Any],
+    model_set_name: str,
+) -> str:
+    """
+    Generate Kiro CLI JSON agent config from a role definition.
+
+    Args:
+        role_name: Name of the role
+        frontmatter: Role frontmatter dict
+        body: Role body content
+        adapter_config: Adapter configuration
+        model_config: Model configuration for this role
+        model_set_name: Name of model set being used
+
+    Returns:
+        JSON string of the agent config
+    """
+    # Map tools from frontmatter
+    tools = frontmatter.get("tools") or frontmatter.get("allowed_tools") or []
+    if isinstance(tools, list):
+        mapped_tools = map_tool_names(tools, adapter_config)
+        # Deduplicate (e.g., Write and Edit both map to fs_write)
+        seen = set()
+        deduped = []
+        for t in mapped_tools:
+            if t not in seen:
+                seen.add(t)
+                deduped.append(t)
+        mapped_tools = deduped
+    else:
+        mapped_tools = ["*"]
+
+    # Replace tool names in the body text
+    prompt = replace_tool_names_in_body(body.strip(), adapter_config)
+
+    # Resolve model (None means use kiro default)
+    model = model_config.get("model") if model_config else None
+
+    # Build agent JSON
+    agent = {
+        "name": role_name,
+        "description": frontmatter.get("description", "").strip() if frontmatter.get("description") else "",
+        "prompt": prompt,
+        "mcpServers": {},
+        "tools": mapped_tools,
+        "toolAliases": {},
+        "allowedTools": [],
+        "resources": [],
+        "hooks": {},
+        "toolsSettings": {},
+        "model": model,
+    }
+
+    return json.dumps(agent, indent=2, ensure_ascii=False) + "\n"
+
+
 def create_skills_symlink(output_dir: Path, skills_source: Path) -> None:
     """
     Create symlink from output skills directory to canonical skills directory.
@@ -442,15 +523,17 @@ def generate_adapter(
 
     # Determine model set to use
     if model_set_name is None:
-        # Use default from adapter config
+        # Use default from adapter config (if one is configured)
         model_sets_config = adapter_config.get("model_sets", {})
         if model_sets_config.get("enabled"):
-            model_set_name = model_sets_config.get("default", "default")
+            default_set = model_sets_config.get("default")
+            if default_set:
+                model_set_name = default_set
 
-    # Load model set (if adapter uses model sets)
+    # Load model set (if adapter uses model sets and a set is specified)
     model_set = None
     model_set_hash = None
-    if adapter_config.get("model_sets", {}).get("enabled"):
+    if adapter_config.get("model_sets", {}).get("enabled") and model_set_name:
         try:
             model_set = load_model_set(adapter_path, model_set_name)
             model_set_file = adapter_path / "model-sets" / f"{model_set_name}.yaml"
@@ -533,15 +616,26 @@ def generate_adapter(
         if model_set:
             model_config = resolve_model_for_role(role_name, model_set)
 
-        # Generate output content
-        output_content = generate_output_file(
-            role_name,
-            frontmatter,
-            body,
-            adapter_config,
-            model_config,
-            model_set_name or "default",
-        )
+        # Generate output content (JSON for kiro, markdown for others)
+        role_format = adapter_config.get("roles", {}).get("format", "markdown")
+        if role_format == "json":
+            output_content = generate_json_agent(
+                role_name,
+                frontmatter,
+                body,
+                adapter_config,
+                model_config,
+                model_set_name or "default",
+            )
+        else:
+            output_content = generate_output_file(
+                role_name,
+                frontmatter,
+                body,
+                adapter_config,
+                model_config,
+                model_set_name or "default",
+            )
 
         # Compute hash
         content_hash = compute_content_hash(output_content)

@@ -164,6 +164,7 @@ select_adapter() {
     echo "  2) OpenCode"
     echo "  3) Factory/Droid"
     echo "  4) Agent Skills (MCP-based tools)"
+    echo "  5) Kiro CLI"
     echo ""
     read -p "Enter choice [1]: " choice
 
@@ -171,6 +172,7 @@ select_adapter() {
         2) echo "opencode" ;;
         3) echo "factory" ;;
         4) echo "agentskills" ;;
+        5) echo "kiro" ;;
         *) echo "claude" ;;
     esac
 }
@@ -208,6 +210,7 @@ case "$SELECTED_ADAPTER" in
     opencode) ADAPTER_DIR="opencode" ;;
     factory) ADAPTER_DIR="factory" ;;
     agentskills) ADAPTER_DIR="agentskills" ;;
+    kiro) ADAPTER_DIR="kiro-cli" ;;
 esac
 
 DEFAULT_MODEL_SET=""
@@ -250,6 +253,12 @@ case "$SELECTED_ADAPTER" in
         ;;
     agentskills)
         # No entry point needed for agent skills
+        ;;
+    kiro)
+        # Run Kiro CLI adapter script
+        if [ -f "$AIX_FRAMEWORK/adapters/kiro-cli/generate.sh" ]; then
+            "$AIX_FRAMEWORK/adapters/kiro-cli/generate.sh" 0
+        fi
         ;;
 esac
 
@@ -308,6 +317,13 @@ case "$SELECTED_ADAPTER" in
     agentskills)
         echo "  .agent/"
         echo "  └── skills/"
+        ;;
+    kiro)
+        echo "  .kiro/"
+        echo "  ├── agents/"
+        echo "  └── skills/"
+        echo ""
+        echo "  AGENTS.md -> .aix/constitution.md"
         ;;
 esac
 

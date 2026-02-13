@@ -1,0 +1,13 @@
+name: budget
+description: Cost-effective models - MiniMax for agentic/tool-use, Qwen for coding, DeepSeek for reasoning
+
+roles:
+  orchestrator: minimax-m2.1
+  analyst: minimax-m2.1
+  coder: qwen3-coder-next
+  reviewer: minimax-m2.1
+  debug: minimax-m2.1
+  product-designer: minimax-m2.1
+  tester: qwen3-coder-next
+  docs: minimax-m2.1
+  triage: minimax-m2.1

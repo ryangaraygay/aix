@@ -1,0 +1,13 @@
+name: pro
+description: Premium Claude models - Opus for reasoning-heavy roles, Sonnet for execution
+
+roles:
+  orchestrator: claude-opus-4.6
+  analyst: claude-opus-4.6
+  coder: claude-sonnet-4.5
+  reviewer: claude-opus-4.6
+  debug: claude-opus-4.6
+  product-designer: claude-opus-4.6
+  tester: claude-sonnet-4.5
+  docs: claude-sonnet-4.5
+  triage: claude-sonnet-4.5

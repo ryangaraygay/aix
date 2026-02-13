@@ -1,0 +1,27 @@
+adapter: kiro
+version: 1
+
+output:
+  agents: .kiro/agents
+  skills: .kiro/skills
+
+skills:
+  strategy: symlink
+
+# Model sets: no default (uses kiro's own model)
+# Pass --model-set budget|mid|pro to override
+model_sets:
+  enabled: true
+
+roles:
+  format: json
+  filename: "{name}.json"
+
+# Kiro-native tool names
+tools:
+  Read: fs_read
+  Write: fs_write
+  Edit: fs_write
+  Bash: execute_bash
+  Grep: grep
+  Glob: glob
