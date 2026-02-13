@@ -4,6 +4,7 @@ adapter-claude	0	adapter	adapters/claude-code	Claude Code adapter
 adapter-opencode	0	adapter	adapters/opencode	OpenCode adapter
 adapter-factory	0	adapter	adapters/factory	Factory/droid adapter
 adapter-agentskills	0	adapter	adapters/agentskills	Skills-only adapter (MCP tools)
+adapter-kiro	0	adapter	adapters/kiro-cli	Kiro CLI adapter
 test	1	skill	skills/test	Run tests
 commit	1	skill	skills/commit	Commit helper
 tester	1	role	roles/tester.md	Tester role
