@@ -1,4 +1,6 @@
-# aix
+# AIX
+
+**(pronounced "ay-eye-ex" or "ayks" like "aches" — your choice)**
 
 **AI development, less painful.**
 
