@@ -7,6 +7,7 @@ metadata:
     - upgrade: boolean (optional) - run upgrade flow instead of init
     - tier: number (optional) - target tier for upgrade
     - adopt: string (optional) - capability name to cherry-pick from higher tiers
+    - add_adapter: string (optional) - add an additional adapter to an existing aix repo
   outputs: |
     - .aix/ directory with framework files
     - CLAUDE.md symlink
@@ -31,6 +32,7 @@ Initialize or upgrade the aix framework in your project.
 /aix-init           # Initialize new project
 /aix-init upgrade   # Upgrade existing project to next tier
 /aix-init adopt     # Cherry-pick individual capabilities from higher tiers
+/aix-init --add-adapter opencode
 ```
 
 ## For Init (new project)
@@ -90,6 +92,29 @@ adopted:
 ```
 
 This prevents re-adoption and informs the upgrade flow about what's already present.
+
+## For Add Adapter (existing project)
+
+Add an additional coding assistant adapter without re-bootstrapping:
+
+```bash
+~/tools/aix/add-adapter.sh <adapter-name>
+~/tools/aix/add-adapter.sh <adapter-name> --model-set <model-set>
+```
+
+Examples:
+
+```bash
+~/tools/aix/add-adapter.sh opencode
+~/tools/aix/add-adapter.sh opencode --model-set codex-5.3
+~/tools/aix/add-adapter.sh kiro --model-set pro
+```
+
+What this does:
+- Copies adapter config into `.aix/adapters/<adapter>/`
+- Enables adapter in `.aix/tier.yaml`
+- Regenerates adapter outputs with `aix-generate.py`
+- Creates tool entrypoint symlink (for adapters that need one)
 
 ## Init Flow
 

@@ -7,7 +7,7 @@ adapter-specific agent configurations for supported coding assistants.
 
 Usage:
     python3 .aix/scripts/aix-generate.py --adapter claude
-    python3 .aix/scripts/aix-generate.py --adapter opencode --model-set codex-5.2
+    python3 .aix/scripts/aix-generate.py --adapter opencode --model-set codex-5.3
     python3 .aix/scripts/aix-generate.py --adapter factory --model-set speed
     python3 .aix/scripts/aix-generate.py --adapter agentskills
     python3 .aix/scripts/aix-generate.py --all
