@@ -94,6 +94,14 @@ Once initialized, use the skill:
 /aix-init upgrade
 ```
 
+### Add Another Adapter
+
+```bash
+~/tools/aix/add-adapter.sh opencode
+# or choose a model set
+~/tools/aix/add-adapter.sh opencode --model-set codex-5.3
+```
+
 The init skill will:
 1. Detect your tech stack (or ask)
 2. Generate appropriate tier structure
