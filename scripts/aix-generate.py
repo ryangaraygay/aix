@@ -343,7 +343,7 @@ def generate_json_agent(
         "mcpServers": {},
         "tools": mapped_tools,
         "toolAliases": {},
-        "allowedTools": [],
+        "allowedTools": mapped_tools,
         "resources": [],
         "hooks": {},
         "toolsSettings": {},
@@ -433,7 +433,7 @@ def update_manifest(
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")
 
 
-def get_enabled_adapters(repo_root: Path) -> Dict[str, str]:
+def get_enabled_adapters(repo_root: Path) -> Dict[str, Optional[str]]:
     """
     Get list of enabled adapters and their model sets from tier.yaml.
 
@@ -447,8 +447,9 @@ def get_enabled_adapters(repo_root: Path) -> Dict[str, str]:
 
     # Simple YAML parsing for tier.yaml
     content = tier_path.read_text()
-    adapters = {}
+    adapters: Dict[str, Optional[str]] = {}
     in_adapters = False
+    adapter_name: Optional[str] = None
 
     for line in content.splitlines():
         line = line.rstrip()
@@ -474,13 +475,13 @@ def get_enabled_adapters(repo_root: Path) -> Dict[str, str]:
                 if len(parts) == 2:
                     enabled = parts[1].strip().lower() == "true"
                     # If disabled, remove from dict
-                    if not enabled and adapter_name in adapters:
+                    if not enabled and adapter_name and adapter_name in adapters:
                         del adapters[adapter_name]
 
             # Parse model_set field: "    model_set: default"
             if "model_set:" in line:
                 parts = line.split("model_set:")
-                if len(parts) == 2 and adapter_name in adapters:
+                if len(parts) == 2 and adapter_name and adapter_name in adapters:
                     adapters[adapter_name] = parts[1].strip()
 
     return adapters
@@ -728,7 +729,7 @@ def main() -> None:
     repo_root = Path(args.repo_root) if args.repo_root else _git_root()
 
     # Determine which adapters to generate
-    adapters_to_generate = {}
+    adapters_to_generate: Dict[str, Optional[str]] = {}
 
     if args.all:
         # Get enabled adapters from tier.yaml
