@@ -53,19 +53,6 @@ Use this skill when:
 
 ## Execution
 
-### Interactive Mode
-
-```bash
-# Full session retrospective
-./scripts/reflect.sh
-
-# Focus on specific area
-./scripts/reflect.sh --focus workflow
-
-# Generate proposals only (skip analysis)
-./scripts/reflect.sh --output proposals
-```
-
 ### Manual Steps
 
 1. **Gather data**
@@ -209,6 +196,6 @@ Approved proposals are tracked in handoff for implementation:
 
 ## See Also
 
-- [Wrap-Up Skill](../../2-grow/skills/wrap-up/SKILL.md) - Session end check
-- [Analyst Role](../../0-seed/roles/analyst.md) - Planning improvements
-- [Reviewer Role](../../0-seed/roles/reviewer.md) - Review improvements
+- [Wrap-Up Skill](../wrap-up/SKILL.md) - Session end check
+- [Analyst Role](../../roles/analyst.md) - Planning improvements
+- [Reviewer Role](../../roles/reviewer.md) - Review improvements
