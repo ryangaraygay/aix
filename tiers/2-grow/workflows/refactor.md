@@ -33,7 +33,7 @@ Use [feature workflow](./feature.md) instead when:
 - Changing application behavior
 - Adding new integrations
 
-Use [quick-fix workflow](../../../tiers/1-sprout/workflows/quick-fix.md) instead when:
+Use [quick-fix workflow](./quick-fix.md) instead when:
 - Single-file changes
 - Simple, well-understood fixes
 - Low-risk updates

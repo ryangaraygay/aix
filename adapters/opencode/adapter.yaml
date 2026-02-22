@@ -10,7 +10,7 @@ skills:
 
 model_sets:
   enabled: true
-  default: antigravity
+  default: codex-5.3
 
 roles:
   format: markdown
