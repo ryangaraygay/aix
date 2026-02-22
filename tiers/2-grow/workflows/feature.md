@@ -401,11 +401,21 @@ Infrastructure changes (Docker, CI/CD, networking) have different risk profiles 
 **Role**: docs
 **Purpose**: Update documentation if the change has user-facing impact
 
+### Mandatory Check
+
+Before deciding whether to skip this phase, **read** the following files (if they exist):
+- `docs/roadmap.md`
+- `docs/capabilities.md`
+
+If either file references the work being completed, update it. Follow each file's stated conventions (e.g., roadmap may be future-work-only with completed items removed, capabilities may be completed-work-only).
+
+Do not decide "no docs needed" from memory. Read first, then decide.
+
 ### When to Run
 
 | Impact | Action |
 |--------|--------|
-| No docs needed | Skip this phase |
+| No docs needed (verified by reading) | Skip this phase |
 | Internal docs | Update developer documentation |
 | External docs | Update user-facing documentation |
 | Both | Update both |

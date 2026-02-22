@@ -274,13 +274,23 @@ Create: `.aix/plans/{refactor-name}/plan.md`
 > **No manual verification phase** - refactors don't have UI to verify.
 > Skip straight to docs if applicable.
 
+### Mandatory Check
+
+Before deciding whether to skip this phase, **read** the following files (if they exist):
+- `docs/roadmap.md`
+- `docs/capabilities.md`
+
+If either file references the work being completed, update it. Follow each file's stated conventions (e.g., roadmap may be future-work-only with completed items removed, capabilities may be completed-work-only).
+
+Do not decide "no docs needed" from memory. Read first, then decide.
+
 ### When to Run
 
-Check `doc_impact` from analyst plan:
+Check `doc_impact` from analyst plan, **after** the mandatory check above:
 
 | doc_impact | Action |
 |------------|--------|
-| `none` | Skip this phase |
+| `none` (verified by reading) | Skip this phase |
 | `internal` | Update internal docs (READMEs, guides, architecture docs) |
 
 > For refactors, `doc_impact` is typically `none` or `internal` only.
