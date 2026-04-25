@@ -6,39 +6,13 @@
 
 ## Known Issues
 
-### Cursor adapter — hooks and MCP pass-through unverified in real sessions
-
-**Adapter:** `cursor`
-**Component:** `adapters/cursor/generate.sh`, `adapters/cursor/adapter.yaml`
-**Status:** Open (deferred from initial PR)
-
-**Problem:**
-The cursor adapter implements opt-in hook generation (`--enable-hooks` flag → `.cursor/hooks.json`) and MCP pass-through (`.aix/mcp.json` → `.cursor/mcp.json`). Both code paths are present and reviewed, but neither has been validated in a real `cursor-agent` IDE or interactive CLI session — only in headless `--print` calls, which don't exercise hook firing or MCP server lifecycle.
-
-**Impact:**
-Schema or behavior bugs in the emitted `hooks.json`/`mcp.json` won't surface until a real user runs the adapter end-to-end. Cursor hooks are still flagged beta (pinned to `version: 1`), so the schema may shift independently.
-
-**Resolution path:**
-Verify via real-session adoption: a user enables hooks and/or has an MCP server, runs cursor-agent normally, and observes expected behavior. If discrepancies surface, open separate PRs to fix.
-
 ### Cursor adapter — workflows reachable but not registered as formal Manual rules
 
-**Adapter:** `cursor`
-**Component:** `adapters/cursor/generate.sh`, `.cursor/rules/workflows/`
-**Status:** Open (deferred from initial PR)
+**Adapter:** `cursor` · **Status:** Open (current behavior; design discussion in [#13](https://github.com/ryangaraygay/aix/issues/13))
 
-**Problem:**
-The cursor adapter symlinks `.cursor/rules/workflows/` → `.aix/workflows/`. Cursor reads the workflow files via `@<name>` file references, but they don't register as formal Cursor Manual rules because they lack the `.mdc` frontmatter Cursor expects (`description`, `globs`, `alwaysApply`).
+The cursor adapter symlinks `.cursor/rules/workflows/` → `.aix/workflows/`. Cursor reads the workflow files via `@<name>` file references but doesn't register them as formal Manual rules (no `.mdc` frontmatter). Workflows are reachable but don't appear in Cursor's rules UI.
 
-**Impact:**
-Workflows don't appear in Cursor's rules UI alongside other project rules; they're reached as plain file references rather than rule activations.
-
-**Resolution path:**
-Two future options, each with trade-offs (see `adapters/cursor/README.md` §4):
-- (a) Generate `.mdc` wrappers in `.cursor/rules/workflows/` with frontmatter — breaks the single-source-of-truth-via-symlink model and risks body drift.
-- (b) Wait for Cursor to add an `@include` directive in `.mdc` rules.
-
-For now we accept the file-ref behavior. Revisit if Cursor adds `@include` or users report missing rule-discoverability.
+The broader design question — how *all* adapters should expose workflows to their target tools — is tracked in [#13](https://github.com/ryangaraygay/aix/issues/13). Current cursor-specific trade-offs documented in `adapters/cursor/README.md` §4.
 
 ### Cursor adapter — subagent `model:` ignored when parent agent is on Auto
 

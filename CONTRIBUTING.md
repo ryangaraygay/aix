@@ -28,6 +28,15 @@ This project follows a standard code of conduct. Be respectful, inclusive, and c
 
 ## How to Contribute
 
+### Where things go
+
+If you're contributing or filing something, the answer is almost always: **open a GitHub Issue**. Bugs, feature requests, design discussions, "how do I" questions — all go in Issues.
+
+For reference (you don't need to learn this):
+
+- **GitHub Issues** — actionable work, design discussions, questions, bugs. Discoverable, threaded, can be assigned. The default for everything.
+- **`docs/ROADMAP.md`** — maintainer-curated index of *known limitations users should be aware of* before adopting (e.g., upstream tool bugs that affect aix). Not a TODO list. Entries link to Issues for tracking actual work.
+
 ### Reporting Issues
 
 - Check existing issues before creating a new one
