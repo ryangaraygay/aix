@@ -12,7 +12,7 @@ MODEL_SET=""
 usage() {
     echo "Usage: $0 <adapter> [--model-set <name>] [--repo-root <path>]"
     echo ""
-    echo "Adapters: claude, opencode, factory, agentskills, kiro"
+    echo "Adapters: claude, opencode, factory, agentskills, kiro, cursor"
     echo ""
     echo "Examples:"
     echo "  $0 opencode"
@@ -73,6 +73,11 @@ case "$ADAPTER_INPUT" in
     kiro|kiro-cli)
         ADAPTER_KEY="kiro"
         ADAPTER_DIR="kiro-cli"
+        ENTRYPOINT="AGENTS.md"
+        ;;
+    cursor)
+        ADAPTER_KEY="cursor"
+        ADAPTER_DIR="cursor"
         ENTRYPOINT="AGENTS.md"
         ;;
     *)

@@ -1,0 +1,17 @@
+name: top-tier
+description: |
+  Maximum reasoning, maximum cost. Same caveat as `pro`: parent agent must
+  be on a pinned non-Auto model for subagent `model:` to be honored
+  reliably in Cursor 2.5. Burns premium-request pool aggressively. Use when
+  quality matters more than cost or speed.
+
+roles:
+  orchestrator: claude-opus-4-7-thinking-high
+  analyst: claude-opus-4-7-thinking-xhigh
+  coder: gpt-5.3-codex-high
+  reviewer: claude-opus-4-7-thinking-max
+  debug: claude-opus-4-7-thinking-xhigh
+  product-designer: claude-opus-4-7-thinking-high
+  tester: gpt-5.3-codex-high
+  docs: claude-opus-4-7-medium
+  triage: claude-4.6-sonnet-medium

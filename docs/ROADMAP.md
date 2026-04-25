@@ -6,6 +6,38 @@
 
 ## Known Issues
 
+### Cursor adapter — hooks and MCP pass-through unverified in real sessions
+
+**Adapter:** `cursor`
+**Component:** `adapters/cursor/generate.sh`, `adapters/cursor/adapter.yaml`
+**Status:** Open (deferred from initial PR)
+
+**Problem:**
+The cursor adapter implements opt-in hook generation (`--enable-hooks` flag → `.cursor/hooks.json`) and MCP pass-through (`.aix/mcp.json` → `.cursor/mcp.json`). Both code paths are present and reviewed, but neither has been validated in a real `cursor-agent` IDE or interactive CLI session — only in headless `--print` calls, which don't exercise hook firing or MCP server lifecycle.
+
+**Impact:**
+Schema or behavior bugs in the emitted `hooks.json`/`mcp.json` won't surface until a real user runs the adapter end-to-end. Cursor hooks are still flagged beta (pinned to `version: 1`), so the schema may shift independently.
+
+**Resolution path:**
+Verify via real-session adoption: a user enables hooks and/or has an MCP server, runs cursor-agent normally, and observes expected behavior. If discrepancies surface, open separate PRs to fix.
+
+### Cursor adapter — subagent `model:` ignored when parent agent is on Auto
+
+**Adapter:** `cursor`
+**Component:** `adapters/cursor/model-sets/`, Cursor 2.5 itself
+**Status:** Open (upstream Cursor bug, documented in adapter README)
+
+**Problem:**
+Cursor 2.5 silently flattens subagent `model:` frontmatter to the parent agent's effective model when the parent runs on Auto, when the user lacks access to the requested model, or for level-2 nested subagents.
+
+**Impact:**
+The `pro` and `top-tier` model sets only honor their pinned premium models when the parent agent is on a pinned non-Auto model. On Auto-mode (default for Hobby tier), all subagents collapse to `composer-2-fast`. Documented in `adapters/cursor/README.md` §3.
+
+**Resolution path:**
+Wait for upstream Cursor fix. Tracked in forum threads [151134](https://forum.cursor.com/t/cursor-rules-and-sub-agent-calls-do-not-work-when-agent-model-is-set-to-auto-or-composer-1/151134), [152440](https://forum.cursor.com/t/sub-agent-ignoring-model-configuration-in-version-2-5/152440), [150846](https://forum.cursor.com/t/my-subagents-cant-be-used-in-auto-model/150846).
+
+---
+
 ### Husky Git Hooks Setup Gap
 
 **Tier:** 1 (Sprout)

@@ -1,0 +1,38 @@
+adapter: cursor
+version: 1
+
+output:
+  agents: .cursor/agents      # subagent .md files (Cursor 2.4+)
+  skills: .cursor/skills      # symlink target
+  rules: .cursor/rules        # workflow symlink lives here
+
+skills:
+  strategy: symlink
+
+model_sets:
+  enabled: true
+  default: default
+
+roles:
+  format: markdown            # cursor frontmatter shape handled by adapter_name branch in scripts/aix-generate.py
+  filename: "{name}.md"
+
+hooks:
+  enabled: false              # opt-in; Cursor hooks still beta
+  config_path: .cursor/hooks.json
+
+mcp:
+  enabled: true
+  config_path: .cursor/mcp.json
+
+# Cursor-native tool name mapping. Informational only — Cursor subagent
+# frontmatter has no per-agent tool allowlist field (only a `readonly`
+# boolean). Kept here for reference and for the cursor branch in
+# scripts/aix-generate.py to derive `readonly` from canonical tool names.
+tools:
+  Read: read_file
+  Write: edit_file
+  Edit: edit_file
+  Bash: run_terminal_cmd
+  Grep: grep
+  Glob: file_search

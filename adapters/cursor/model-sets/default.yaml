@@ -1,0 +1,20 @@
+name: default
+description: |
+  Auto-friendly default. Works on Cursor Free (Hobby) and on paid Auto billing.
+  Orchestration roles route through `auto` (Cursor picks); execution roles pin
+  Cursor's own Composer models so they remain unmetered on free and avoid the
+  Cursor 2.5 subagent-model-fallback bug (subagent `model:` is silently ignored
+  when the parent agent is on Auto — fallback is to Composer anyway, so we
+  match that explicitly for predictability).
+default: true
+
+roles:
+  orchestrator: auto
+  analyst: composer-2
+  coder: composer-2-fast
+  reviewer: composer-2
+  debug: composer-2
+  product-designer: composer-2
+  tester: composer-2-fast
+  docs: composer-2-fast
+  triage: composer-2-fast

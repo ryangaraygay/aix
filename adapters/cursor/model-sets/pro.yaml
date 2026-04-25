@@ -1,0 +1,17 @@
+name: pro
+description: |
+  Solid premium mix for paid Cursor users running the parent agent on a
+  pinned (non-Auto) model. Subagent `model:` frontmatter is reliably honored
+  in Cursor 2.5 only when the parent is non-Auto — see adapter README for the
+  fallback caveat. Burns from your premium-request pool.
+
+roles:
+  orchestrator: claude-4.6-sonnet-medium
+  analyst: claude-opus-4-7-medium
+  coder: claude-4.6-sonnet-medium
+  reviewer: claude-opus-4-7-thinking-medium
+  debug: claude-opus-4-7-thinking-medium
+  product-designer: claude-opus-4-7-medium
+  tester: gpt-5.4-medium
+  docs: claude-4.6-sonnet-medium
+  triage: gpt-5.4-mini-medium
