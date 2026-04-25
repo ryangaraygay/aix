@@ -1,7 +1,8 @@
 #!/bin/bash
 # Bootstrap aix in a new project
-# Usage: curl -fsSL https://raw.githubusercontent.com/ryangaraygay/aix/main/bootstrap.sh | bash
-#    or: ~/tools/aix/bootstrap.sh
+# Usage: ~/tools/aix/bootstrap.sh
+#    (run from inside the project that should adopt aix; requires aix
+#     framework cloned at $AIX_FRAMEWORK, defaults to ~/tools/aix)
 
 set -e
 

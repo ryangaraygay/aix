@@ -117,22 +117,20 @@ The init skill will:
 
 ## Adoption
 
-**Most projects:** Bootstrap copies files into your project (simple, self-contained)
+Clone the framework once, then bootstrap each project that should adopt aix:
 
 ```bash
+# One-time setup
 git clone git@github.com:ryangaraygay/aix.git ~/tools/aix
+
+# In each project
 cd my-project
 ~/tools/aix/bootstrap.sh
 ```
 
-**AIX contributors:** Submodule for tight coupling
+Files are copied into the project's `.aix/` directory — no external dependency, no submodule. To contribute to aix itself, work in the cloned aix repo directly.
 
-```bash
-git submodule add git@github.com:ryangaraygay/aix.git .aix
-./.aix/adapters/claude-code/generate.sh 0
-```
-
-See **[docs/adoption.md](docs/adoption.md)** for full details on adoption paths, version management, and decision matrix.
+See **[docs/adoption.md](docs/adoption.md)** for the full guide and lifecycle scenarios.
 
 ---
 

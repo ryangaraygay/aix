@@ -7,11 +7,12 @@ How to add AIX to your project and keep it evolving without losing local adaptat
 ## TL;DR
 
 ```bash
-# Most projects: bootstrap (copy)
-curl -fsSL https://raw.githubusercontent.com/ryangaraygay/aix/main/bootstrap.sh | bash
+# One-time: clone the framework somewhere stable
+git clone git@github.com:ryangaraygay/aix.git ~/tools/aix
 
-# AIX contributors: submodule
-git submodule add git@github.com:ryangaraygay/aix.git .aix
+# In each project: bootstrap from your local clone
+cd my-project
+~/tools/aix/bootstrap.sh
 ```
 
 ---
@@ -20,7 +21,7 @@ git submodule add git@github.com:ryangaraygay/aix.git .aix
 
 - **Capabilities are the atomic unit** (roles, workflows, skills, hooks, docs).
 - **Tiers are curated bundles** of capabilities, not separate systems.
-- **AIX is file-based** (no runtime dependency). Adoption is copying files or using a submodule.
+- **AIX is file-based** (no runtime dependency). Adoption is copying tier files into your project's `.aix/`.
 - **Evolution should be additive and safe**, never blind overwrite.
 
 ## Lifecycle Scenarios
@@ -67,14 +68,15 @@ These are created by bootstrap/upgrade/adopt and enable safe evolution.
 - Files are yours - no external dependencies after setup
 
 ```bash
-# Clone once
+# One-time: clone the framework
 git clone git@github.com:ryangaraygay/aix.git ~/tools/aix
+
+# In each project that should adopt aix
 cd my-project
 ~/tools/aix/bootstrap.sh
-
-# Or one-liner from anywhere
-curl -fsSL https://raw.githubusercontent.com/ryangaraygay/aix/main/bootstrap.sh | bash
 ```
+
+> **Note:** A `curl … | bash` one-liner installer is not yet implemented. Tracked separately if/when it ships.
 
 **After bootstrap:**
 ```
@@ -114,83 +116,18 @@ my-project/
 - Self-contained after setup
 - Simple git workflow (just files)
 - Works with any language/stack
-- No submodule complexity
 
 **Cons:**
-- Can get stale (upgrade manually)
+- Can get stale (upgrade manually via `~/tools/aix/upgrade.sh`)
 - No automatic sync with AIX updates
 
 ---
 
-### 2. Submodule
+## Why bootstrap-copy is the only adoption path
 
-**For:**
-- Repos that build or extend AIX tooling
-- Contributors to AIX itself
-- Projects that need bleeding-edge AIX
+The aix philosophy is "files are yours" — once bootstrapped, your project owns its `.aix/` directory and has no runtime dependency on the aix framework. There's no submodule path, no curl-pipe installer, no version pinning to manage. Update on your schedule by re-running `~/tools/aix/upgrade.sh` or by adopting individual capabilities with `~/tools/aix/adopt.sh`.
 
-**How it works:**
-- `.aix/` is a git submodule pointing to the AIX repo
-- Full tier structure available at `.aix/tiers/`
-- Changes to AIX can be contributed back
-
-```bash
-cd my-project
-git submodule add git@github.com:ryangaraygay/aix.git .aix
-./.aix/adapters/claude-code/generate.sh 0
-```
-
-**After submodule:**
-```
-my-project/
-├── CLAUDE.md              → .aix/tiers/0-seed/constitution.md
-├── .claude/
-│   ├── agents/            → .aix/tiers/0-seed/roles/
-│   ├── skills/            → .aix/tiers/0-seed/skills/
-│   └── settings.json
-├── .aix/                   # git submodule
-│   ├── tiers/
-│   │   ├── 0-seed/
-│   │   ├── 1-sprout/
-│   │   ├── 2-grow/
-│   │   └── 3-scale/
-│   ├── adapters/
-│   ├── bootstrap.sh
-│   └── upgrade.sh
-└── .gitmodules
-```
-
-**Updating:**
-```bash
-cd .aix
-git fetch origin
-git checkout origin/main
-cd ..
-./.aix/adapters/claude-code/generate.sh 0
-```
-
-**Pros:**
-- Always has full framework
-- Can contribute changes back
-- Tight coupling for AIX development
-
-**Cons:**
-- Complex git workflow
-- Detached HEAD issues
-- Larger repo size
-- Submodule learning curve
-
----
-
-## Decision Matrix
-
-| If you are... | Use |
-|---------------|-----|
-| Adding AIX to a new/existing project | **Bootstrap** |
-| Building tools that use AIX | **Submodule** |
-| Contributing to AIX itself | **Submodule** |
-| Experimenting with AIX | **Bootstrap** |
-| Running AIX in CI/CD | **Bootstrap** (simpler) |
+To contribute *to* aix itself, clone `ryangaraygay/aix` directly and work in that repo.
 
 ---
 
@@ -232,7 +169,7 @@ These approaches were considered but rejected:
 | **GitHub template** | Only works for new repos, no upgrade path |
 | **Docker image** | Overkill for what's essentially config files |
 
-AIX is fundamentally **methodology files** (markdown, yaml, shell scripts). Keeping it as files that get copied or submoduled is the simplest, most portable approach.
+AIX is fundamentally **methodology files** (markdown, yaml, shell scripts). Keeping it as files that get copied into projects is the simplest, most portable approach.
 
 ---
 
