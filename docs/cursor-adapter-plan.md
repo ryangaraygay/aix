@@ -133,9 +133,7 @@ tools:
 - If `--enable-hooks` and `.aix/hooks/` exists, write `.cursor/hooks.json`.
 - If `.aix/mcp.json` exists, copy/symlink to `.cursor/mcp.json`.
 
-**`adapters/cursor/templates/`**
-- `subagent.md.tmpl` — frontmatter + body skeleton for `.cursor/agents/<role>.md`.
-- `hooks.json.tmpl` — base structure for opt-in hook generation.
+**No `templates/` directory.** Initial design assumed templated emission but the implementation hardcodes both the subagent frontmatter shape (in `scripts/aix-generate.py` cursor branch) and the hook config (heredoc in `generate.sh`). Templates added then removed pre-merge — see commit history.
 
 **`adapters/cursor/model-sets/{default,budget,mid,pro}.yaml`**
 - Same shape as claude-code's model-sets. Per-role `model:` consumed by the new cursor branch in the generator and emitted into subagent frontmatter.
@@ -197,7 +195,7 @@ Build in stages. Each stage ends with **one** live `cursor-agent -p` call that c
 
 | # | Build | Static verify (no live call) | Live verify (1 `cursor-agent -p` call) |
 |---|---|---|---|
-| **0** | `adapters/cursor/{adapter.yaml, generate.sh, model-sets/, templates/, README.md}` skeleton | `yamllint adapter.yaml`; `bash -n generate.sh` | — |
+| **0** | `adapters/cursor/{adapter.yaml, generate.sh, model-sets/, README.md}` skeleton | `yamllint adapter.yaml`; `bash -n generate.sh` | — |
 | **1** | Add `adapter_name == "cursor"` branch to `scripts/aix-generate.py` (Cursor-shaped frontmatter on top of `format: markdown`) | Run `aix-generate.py --adapter cursor --dry-run` → inspect emitted `.cursor/agents/*.md` frontmatter & body | — |
 | **2** | `generate.sh` creates `AGENTS.md` symlink → `.aix/constitution.md` | `ls -la AGENTS.md`; target resolves | `agent -p "Quote the first line of your project guidance/constitution." --output-format text` → must reference constitution content |
 | **3** | Subagents emitted to `.cursor/agents/*.md` | `for f in .cursor/agents/*.md; do head -10 "$f"; done` — all frontmatter parses | `agent -p "List the named subagents available in this project with their descriptions." --output-format json` → enumerates our roles |

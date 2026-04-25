@@ -47,6 +47,7 @@ if [ -d "$AIX_DIR/tiers" ]; then
     HOOKS_CMD_PATH="./.aix/$TIER_PATH/hooks"
     echo "Detected submodule structure"
 else
+    TIER_PATH=""
     CONSTITUTION_PATH=".aix/constitution.md"
     SKILLS_PATH="../.aix/skills"
     WORKFLOWS_PATH="../../.aix/workflows"
@@ -71,35 +72,49 @@ else
     echo "✓ Created AGENTS.md symlink -> $CONSTITUTION_PATH"
 fi
 
-mkdir -p "$CURSOR_DIR/agents" "$CURSOR_DIR/rules"
+mkdir -p "$CURSOR_DIR/agents"
 
 # Skills symlink
 if [ -L "$CURSOR_DIR/skills" ] || [ -d "$CURSOR_DIR/skills" ]; then
     rm -rf "$CURSOR_DIR/skills"
 fi
-if [ -d "$AIX_DIR/skills" ] || [ -d "$AIX_DIR/$TIER_PATH/skills" ] 2>/dev/null; then
+if [ -d "$AIX_DIR/skills" ] || [ -n "$TIER_PATH" -a -d "$AIX_DIR/$TIER_PATH/skills" ]; then
     ln -s "$SKILLS_PATH" "$CURSOR_DIR/skills"
     echo "✓ Created .cursor/skills symlink -> $SKILLS_PATH"
 fi
 
 # Workflows symlink (under .cursor/rules so Cursor sees workflows as @-invokable rules)
-if [ -L "$CURSOR_DIR/rules/workflows" ] || [ -d "$CURSOR_DIR/rules/workflows" ]; then
-    rm -rf "$CURSOR_DIR/rules/workflows"
-fi
-if [ -d "$AIX_DIR/workflows" ] || [ -d "$AIX_DIR/$TIER_PATH/workflows" ] 2>/dev/null; then
+# .cursor/rules dir is created on demand here, only when there are workflows to expose.
+if [ -d "$AIX_DIR/workflows" ] || [ -n "$TIER_PATH" -a -d "$AIX_DIR/$TIER_PATH/workflows" ]; then
+    mkdir -p "$CURSOR_DIR/rules"
+    if [ -L "$CURSOR_DIR/rules/workflows" ] || [ -d "$CURSOR_DIR/rules/workflows" ]; then
+        rm -rf "$CURSOR_DIR/rules/workflows"
+    fi
     ln -s "$WORKFLOWS_PATH" "$CURSOR_DIR/rules/workflows"
     echo "✓ Created .cursor/rules/workflows symlink -> $WORKFLOWS_PATH"
 fi
 
-# Subagents — emitted by aix-generate.py (stage 1 wires this up)
+# Subagents — emitted by aix-generate.py.
+# Unlike the claude-code adapter (which symlinks roles directly because the
+# canonical aix frontmatter shape matches Claude's), Cursor needs frontmatter
+# transformation (name/description/model/readonly/is_background) so we always
+# run the generator. Errors must propagate — a silent failure here yields an
+# empty .cursor/agents/ that looks fine but breaks the install.
+#
+# Note: bootstrap.sh also invokes aix-generate.py (line ~235) with stderr
+# suppressed; this second invocation is the authoritative one. Re-runs are
+# cheap because the generator hash-skips unchanged files.
 GENERATOR="$AIX_DIR/scripts/aix-generate.py"
 if [ -f "$GENERATOR" ]; then
-    python3 "$GENERATOR" --adapter cursor || echo "⚠ aix-generate.py --adapter cursor failed (expected until stage 1 lands)"
+    python3 "$GENERATOR" --adapter cursor --repo-root "$REPO_ROOT"
 else
-    echo "⚠ aix-generate.py not found at $GENERATOR; skipping subagent emission"
+    echo "Error: aix-generate.py not found at $GENERATOR" >&2
+    exit 1
 fi
 
-# Hooks (opt-in)
+# Hooks (opt-in). Only the preCompact hook is wired today — sessionStart with
+# matcher: "compact" (claude's pattern) needs Cursor matcher-value confirmation
+# before we can emit it safely. See docs/ROADMAP.md for the deferred work.
 HOOKS_FILE="$CURSOR_DIR/hooks.json"
 if [ "$ENABLE_HOOKS" = true ] && [ -d "$HOOKS_DIR" ] && [ -f "$HOOKS_DIR/pre-compact.sh" ]; then
     cat > "$HOOKS_FILE" << EOF
@@ -109,12 +124,6 @@ if [ "$ENABLE_HOOKS" = true ] && [ -d "$HOOKS_DIR" ] && [ -f "$HOOKS_DIR/pre-com
     "preCompact": [
       {
         "command": "$HOOKS_CMD_PATH/pre-compact.sh",
-        "type": "command"
-      }
-    ],
-    "sessionStart": [
-      {
-        "command": "$HOOKS_CMD_PATH/post-compact.sh",
         "type": "command"
       }
     ]

@@ -16,6 +16,9 @@ Thumbs.db
 *.pyc
 __pycache__/
 .coverage
+.pytest_cache/
+.venv/
+venv/
 
 # Environment
 .env
