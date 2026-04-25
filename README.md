@@ -43,7 +43,10 @@ The **constitution + workflow + role** trinity with **approval gates** and **pro
 | **kiro-cli** | Kiro CLI | `AGENTS.md` symlink | `.kiro/agents/` (JSON) | `.kiro/skills/` symlink | budget, mid, pro |
 | **opencode** | OpenCode | `AGENTS.md` symlink | `.opencode/agent/` (markdown) | `.opencode/skills/` symlink | antigravity |
 | **factory** | Factory/Droid | `GEMINI.md` symlink | `.factory/droids/` (markdown) | `.factory/skills/` symlink | balanced, optimal, speed |
+| **cursor** | Cursor | `AGENTS.md` symlink | `.cursor/agents/` (markdown subagents) | `.cursor/skills/` symlink | default, pro, top-tier |
 | **agentskills** | MCP-based tools | — | — | `.agent/skills/` symlink | — |
+
+> **Cursor users**: see [`adapters/cursor/README.md`](adapters/cursor/README.md) for Cursor-specific quirks (no per-role tool allowlist; subagent `model:` is silently coerced to Composer when parent runs on Auto). Hooks and MCP pass-through are wired but unverified in real cursor-agent sessions — defer real-world validation. See [`docs/adapter-capabilities.md`](docs/adapter-capabilities.md) for the side-by-side adapter matrix.
 
 ---
 
@@ -114,22 +117,20 @@ The init skill will:
 
 ## Adoption
 
-**Most projects:** Bootstrap copies files into your project (simple, self-contained)
+Clone the framework once, then bootstrap each project that should adopt aix:
 
 ```bash
+# One-time setup
 git clone git@github.com:ryangaraygay/aix.git ~/tools/aix
+
+# In each project
 cd my-project
 ~/tools/aix/bootstrap.sh
 ```
 
-**AIX contributors:** Submodule for tight coupling
+Files are copied into the project's `.aix/` directory — no external dependency, no submodule. To contribute to aix itself, work in the cloned aix repo directly.
 
-```bash
-git submodule add git@github.com:ryangaraygay/aix.git .aix
-./.aix/adapters/claude-code/generate.sh 0
-```
-
-See **[docs/adoption.md](docs/adoption.md)** for full details on adoption paths, version management, and decision matrix.
+See **[docs/adoption.md](docs/adoption.md)** for the full guide and lifecycle scenarios.
 
 ---
 

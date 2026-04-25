@@ -1,0 +1,40 @@
+adapter: cursor
+version: 1
+
+output:
+  agents: .cursor/agents      # subagent .md files (Cursor 2.4+)
+  skills: .cursor/skills      # symlink target
+  rules: .cursor/rules        # workflow symlink lives here
+
+skills:
+  strategy: symlink
+
+model_sets:
+  enabled: true
+  default: default
+
+roles:
+  format: markdown            # cursor frontmatter shape handled by adapter_name branch in scripts/aix-generate.py
+  filename: "{name}.md"
+
+hooks:
+  enabled: false              # opt-in; Cursor hooks still beta
+  config_path: .cursor/hooks.json
+
+mcp:
+  enabled: true
+  config_path: .cursor/mcp.json
+
+# Cursor-native tool name mapping. Informational only — neither emitted into
+# subagent files nor consulted by the generator. The cursor branch in
+# scripts/aix-generate.py derives `readonly` from a hardcoded set of
+# canonical write-tool names ({Write, Edit, MultiEdit, NotebookEdit}), not
+# from this mapping. Kept here as documentation of Cursor's native tool
+# names for future use (e.g., body-text substitution).
+tools:
+  Read: read_file
+  Write: edit_file
+  Edit: edit_file
+  Bash: run_terminal_cmd
+  Grep: grep
+  Glob: file_search

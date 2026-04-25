@@ -247,9 +247,30 @@ def generate_output_file(
         if adapter_name == "opencode":
             # OpenCode uses object format with boolean values: {read: true, write: true}
             new_frontmatter["tools"] = {tool: True for tool in mapped_tools}
+        elif adapter_name == "cursor":
+            # Cursor subagents have no per-agent tool allowlist, only a `readonly` boolean
+            pass
         else:
             # Claude and others use array format: [Read, Write, Bash]
             new_frontmatter["tools"] = mapped_tools
+
+    # Cursor-specific frontmatter: readonly boolean derived from tools, plus
+    # is_background. No per-agent tools array, no reasoningEffort (Cursor
+    # encodes reasoning level in the model name suffix, e.g. -thinking-high).
+    #
+    # Empirically (Cursor 2.5, April 2026), `readonly: true` does NOT gate
+    # Bash — a readonly subagent can still run shell commands. So write_tools
+    # only includes file-mutation tools, not Bash. Roles with Read+Bash+Grep+Glob
+    # (like reviewer) correctly emit readonly: true.
+    if adapter_name == "cursor":
+        write_tools = {"Write", "Edit", "MultiEdit", "NotebookEdit"}
+        role_tools = frontmatter.get("tools") or frontmatter.get("allowed_tools") or []
+        if isinstance(role_tools, list) and role_tools:
+            new_frontmatter["readonly"] = not any(t in write_tools for t in role_tools)
+        else:
+            new_frontmatter["readonly"] = False
+        new_frontmatter["is_background"] = False
+        new_frontmatter.pop("reasoningEffort", None)
 
     # Convert frontmatter to YAML with flow style for tools list
     # Use custom representer to output short lists in flow style

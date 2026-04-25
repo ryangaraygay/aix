@@ -1,7 +1,8 @@
 #!/bin/bash
 # Bootstrap aix in a new project
-# Usage: curl -fsSL https://raw.githubusercontent.com/ebblyn/aix/main/bootstrap.sh | bash
-#    or: ~/tools/aix/bootstrap.sh
+# Usage: ~/tools/aix/bootstrap.sh
+#    (run from inside the project that should adopt aix; requires aix
+#     framework cloned at $AIX_FRAMEWORK, defaults to ~/tools/aix)
 
 set -e
 
@@ -165,6 +166,7 @@ select_adapter() {
     echo "  3) Factory/Droid"
     echo "  4) Agent Skills (MCP-based tools)"
     echo "  5) Kiro CLI"
+    echo "  6) Cursor"
     echo ""
     read -p "Enter choice [1]: " choice
 
@@ -173,6 +175,7 @@ select_adapter() {
         3) echo "factory" ;;
         4) echo "agentskills" ;;
         5) echo "kiro" ;;
+        6) echo "cursor" ;;
         *) echo "claude" ;;
     esac
 }
@@ -211,6 +214,7 @@ case "$SELECTED_ADAPTER" in
     factory) ADAPTER_DIR="factory" ;;
     agentskills) ADAPTER_DIR="agentskills" ;;
     kiro) ADAPTER_DIR="kiro-cli" ;;
+    cursor) ADAPTER_DIR="cursor" ;;
 esac
 
 DEFAULT_MODEL_SET=""
@@ -258,6 +262,12 @@ case "$SELECTED_ADAPTER" in
         # Run Kiro CLI adapter script
         if [ -f "$AIX_FRAMEWORK/adapters/kiro-cli/generate.sh" ]; then
             "$AIX_FRAMEWORK/adapters/kiro-cli/generate.sh" 0
+        fi
+        ;;
+    cursor)
+        # Run Cursor adapter script (creates AGENTS.md, .cursor/agents/, skills + workflow symlinks)
+        if [ -f "$AIX_FRAMEWORK/adapters/cursor/generate.sh" ]; then
+            "$AIX_FRAMEWORK/adapters/cursor/generate.sh" 0
         fi
         ;;
 esac
@@ -322,6 +332,15 @@ case "$SELECTED_ADAPTER" in
         echo "  .kiro/"
         echo "  ├── agents/"
         echo "  └── skills/"
+        echo ""
+        echo "  AGENTS.md -> .aix/constitution.md"
+        ;;
+    cursor)
+        echo "  .cursor/"
+        echo "  ├── agents/   (subagents)"
+        echo "  ├── rules/"
+        echo "  │   └── workflows/  -> .aix/workflows"
+        echo "  └── skills/         -> .aix/skills"
         echo ""
         echo "  AGENTS.md -> .aix/constitution.md"
         ;;
