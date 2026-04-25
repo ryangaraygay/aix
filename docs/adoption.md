@@ -8,10 +8,10 @@ How to add AIX to your project and keep it evolving without losing local adaptat
 
 ```bash
 # Most projects: bootstrap (copy)
-curl -fsSL https://aix.dev/install | bash
+curl -fsSL https://raw.githubusercontent.com/ryangaraygay/aix/main/bootstrap.sh | bash
 
 # AIX contributors: submodule
-git submodule add git@github.com:ebblyn/aix.git .aix
+git submodule add git@github.com:ryangaraygay/aix.git .aix
 ```
 
 ---
@@ -67,16 +67,13 @@ These are created by bootstrap/upgrade/adopt and enable safe evolution.
 - Files are yours - no external dependencies after setup
 
 ```bash
-# Current (while repo is private)
-git clone git@github.com:ebblyn/aix.git ~/tools/aix
+# Clone once
+git clone git@github.com:ryangaraygay/aix.git ~/tools/aix
 cd my-project
 ~/tools/aix/bootstrap.sh
 
-# Future (when public)
-curl -fsSL https://aix.dev/install | bash
-
-# With version pinning (planned)
-AIX_VERSION=1.2.0 curl -fsSL https://aix.dev/install | bash
+# Or one-liner from anywhere
+curl -fsSL https://raw.githubusercontent.com/ryangaraygay/aix/main/bootstrap.sh | bash
 ```
 
 **After bootstrap:**
@@ -139,7 +136,7 @@ my-project/
 
 ```bash
 cd my-project
-git submodule add git@github.com:ebblyn/aix.git .aix
+git submodule add git@github.com:ryangaraygay/aix.git .aix
 ./.aix/adapters/claude-code/generate.sh 0
 ```
 

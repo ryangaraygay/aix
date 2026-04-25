@@ -1,6 +1,6 @@
 #!/bin/bash
 # Bootstrap aix in a new project
-# Usage: curl -fsSL https://raw.githubusercontent.com/ebblyn/aix/main/bootstrap.sh | bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/ryangaraygay/aix/main/bootstrap.sh | bash
 #    or: ~/tools/aix/bootstrap.sh
 
 set -e
