@@ -189,4 +189,4 @@ aix embodies this: you focus on the "why" and "what", AI handles the "how".
 
 ## License
 
-AGPL-3.0 - See [LICENSE](LICENSE)
+MIT - See [LICENSE](LICENSE)
