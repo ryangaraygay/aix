@@ -15,10 +15,11 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Verify Signed-off-by on every commit
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           set -euo pipefail
-          base="${{ github.event.pull_request.base.sha }}"
-          head="${{ github.event.pull_request.head.sha }}"
           missing=0
           while read -r sha; do
             if ! git log -1 --format='%(trailers:key=Signed-off-by,valueonly)' "$sha" | grep -q .; then
@@ -27,7 +28,7 @@ jobs:
               echo "::error::Commit $sha by $author missing Signed-off-by — \"$subject\""
               missing=1
             fi
-          done < <(git rev-list "$base".."$head")
+          done < <(git rev-list "$BASE_SHA".."$HEAD_SHA")
           if [ "$missing" -ne 0 ]; then
             echo ""
             echo "Fix: amend each missing commit with"
