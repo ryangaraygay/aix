@@ -1,0 +1,43 @@
+name: DCO
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  check-dco:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.user.type != 'Bot'
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Verify Signed-off-by on every commit
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          missing=0
+          while read -r sha; do
+            if ! git log -1 --format='%(trailers:key=Signed-off-by,valueonly)' "$sha" | grep -q .; then
+              author=$(git log -1 --format='%an <%ae>' "$sha")
+              subject=$(git log -1 --format='%s' "$sha")
+              echo "::error::Commit $sha by $author missing Signed-off-by — \"$subject\""
+              missing=1
+            fi
+          done < <(git rev-list "$BASE_SHA".."$HEAD_SHA")
+          if [ "$missing" -ne 0 ]; then
+            echo ""
+            echo "Fix: amend each missing commit with"
+            echo "    git commit --amend -s --no-edit    # for the latest commit"
+            echo "or, for multiple commits, use"
+            echo "    git rebase --signoff main"
+            echo "then push with --force-with-lease."
+            echo ""
+            echo "See CONTRIBUTING.md for the DCO sign-off explanation."
+            exit 1
+          fi
+          echo "All commits signed off."

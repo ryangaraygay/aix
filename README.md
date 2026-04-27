@@ -194,3 +194,7 @@ MIT - See [LICENSE](LICENSE)
 ## Trademark
 
 The "AIX" name is a reserved project identifier — see [TRADEMARK.md](TRADEMARK.md). Code is MIT (use freely); the name is governed by the trademark policy. TL;DR: refer to AIX freely, do not rename your fork "AIX".
+
+## Contributing
+
+Contributions are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md). Commits must be signed off (DCO): use `git commit -s`. A CI check enforces this on every PR.
