@@ -206,11 +206,7 @@ New tiers should be discussed in an issue first. Tiers follow the progression:
 
 ## License
 
-By contributing to AIX, you agree that your contributions will be licensed under the project's AGPL-3.0 license.
-
-### Contributor License Agreement
-
-For significant contributions, you may be asked to sign a CLA that grants the project maintainers rights to use your contribution under any license. This enables dual-licensing if needed.
+By contributing to AIX, you agree that your contributions will be licensed under the MIT License (see [LICENSE](LICENSE)).
 
 ## Questions?
 
