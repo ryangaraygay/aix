@@ -208,6 +208,28 @@ New tiers should be discussed in an issue first. Tiers follow the progression:
 
 By contributing to AIX, you agree that your contributions will be licensed under the MIT License (see [LICENSE](LICENSE)).
 
+## Sign your commits (DCO)
+
+AIX uses the [Developer Certificate of Origin](https://developercertificate.org/) (DCO). Every commit in a pull request must include a `Signed-off-by:` trailer affirming that you wrote the contribution (or otherwise have the right to submit it under the project's license).
+
+Sign each commit by adding `-s` when you commit:
+
+```bash
+git commit -s -m "your message"
+```
+
+This appends a line like `Signed-off-by: Your Name <your.email@example.com>` to the commit message, using your `git config user.name` and `user.email`.
+
+A CI check verifies sign-off on every commit. If you forget:
+
+```bash
+git commit --amend -s --no-edit          # for the latest commit
+git rebase --signoff main                # for multiple commits
+git push --force-with-lease              # update the PR branch
+```
+
+Bot-authored PRs (e.g. Dependabot) are exempt from the check.
+
 ## Questions?
 
 - Open an issue for questions
