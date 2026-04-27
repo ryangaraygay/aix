@@ -190,3 +190,7 @@ aix embodies this: you focus on the "why" and "what", AI handles the "how".
 ## License
 
 MIT - See [LICENSE](LICENSE)
+
+## Trademark
+
+The "AIX" name is a reserved project identifier — see [TRADEMARK.md](TRADEMARK.md). Code is MIT (use freely); the name is governed by the trademark policy. TL;DR: refer to AIX freely, do not rename your fork "AIX".
